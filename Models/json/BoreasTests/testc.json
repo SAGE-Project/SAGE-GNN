@@ -1,0 +1,120 @@
+{
+  "application": "testc-boreas",
+  "comment-general": "",
+  "components": [
+    {
+      "id": 1,
+      "name": "balder",
+      "Compute": {
+        "CPU": 200,
+        "GPU": "false",
+        "Memory": 800
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 2,
+      "name": "freyja",
+      "Compute": {
+        "CPU": 300,
+        "GPU": "false",
+        "Memory": 1200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 3,
+      "name": "nerthus",
+      "Compute": {
+        "CPU": 300,
+        "GPU": "false",
+        "Memory": 1200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 4,
+      "name": "skadi",
+      "Compute": {
+        "CPU": 200,
+        "GPU": "false",
+        "Memory": 800
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    }
+  ],
+  "IP": {
+    "publicIPs": 1,
+    "IPType": "IP4"
+  },
+  "restrictions": [
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        1
+      ],
+      "bound": 4
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        2
+      ],
+      "bound": 4
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        3
+      ],
+      "bound": 4
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        4
+      ],
+      "bound": 8
+    },
+    {
+      "type": "Conflicts",
+      "alphaCompId": 1,
+      "compsIdList": [
+        4
+      ]
+    },
+    {
+      "type": "OneToOneDependency",
+      "alphaCompId": 2,
+      "betaCompId": 3
+    }
+  ]
+}

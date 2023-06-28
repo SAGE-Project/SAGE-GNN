@@ -1,0 +1,384 @@
+{
+  "application": "TestK8sCase1",
+  "comment-general": "",
+  "components": [
+    {
+      "id": 1,
+      "name": "comp1",
+      "Compute": {
+        "CPU": 397,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 2,
+      "name": "comp2",
+      "Compute": {
+        "CPU": 368,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 3,
+      "name": "comp3",
+      "Compute": {
+        "CPU": 255,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 4,
+      "name": "comp4",
+      "Compute": {
+        "CPU": 280,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 5,
+      "name": "comp5",
+      "Compute": {
+        "CPU": 280,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 6,
+      "name": "comp6",
+      "Compute": {
+        "CPU": 178,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 7,
+      "name": "comp7",
+      "Compute": {
+        "CPU": 268,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 8,
+      "name": "comp8",
+      "Compute": {
+        "CPU": 124,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 9,
+      "name": "comp9",
+      "Compute": {
+        "CPU": 241,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 10,
+      "name": "comp10",
+      "Compute": {
+        "CPU": 224,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 1000
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 11,
+      "name": "comp11",
+      "comments": "As load balancers, either DNS or HTTP",
+      "Compute": {
+        "CPU": 2596,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 12,
+      "name": "comp12",
+      "comments": "As load balancers, either DNS or HTTP",
+      "Compute": {
+        "CPU": 2292,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 13,
+      "name": "comp13",
+      "comments": "As load balancers, either DNS or HTTP",
+      "Compute": {
+        "CPU": 2744,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 14,
+      "name": "comp14",
+      "comments": "As load balancers, either DNS or HTTP",
+      "Compute": {
+        "CPU": 2309,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    },
+    {
+      "id": 15,
+      "name": "comp15",
+      "comments": "As load balancers, either DNS or HTTP",
+      "Compute": {
+        "CPU": 2473,
+        "GPU": "false",
+        "Memory": 200
+      },
+      "Storage": {
+        "StorageType": "HDD",
+        "StorageSize": 500
+      },
+      "Network": {},
+      "keywords": [],
+      "operatingSystem": "Linux",
+      "preferences": {}
+    }
+  ],
+  "IP": {
+    "publicIPs": 1,
+    "IPType": "IP4"
+  },
+  "restrictions": [
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        0
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        1
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        2
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        3
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        4
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        5
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        6
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        7
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        8
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        9
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        10
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        11
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        12
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        13
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        14
+      ],
+      "bound": 1
+    },
+    {
+      "type": "LowerBound",
+      "compsIdList": [
+        15
+      ],
+      "bound": 1
+    }
+  ]
+}
