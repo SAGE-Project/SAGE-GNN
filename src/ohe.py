@@ -10,4 +10,3 @@ def edge_constraints_encoding(constraint):
     result = list(np.zeros(len(all_constraints), dtype=int))
     result[mapping[constraint]] = 1
     return result
-
