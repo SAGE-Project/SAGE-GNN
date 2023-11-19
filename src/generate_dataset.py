@@ -2,7 +2,6 @@ import itertools
 import json
 from Wrapper_Z3 import Wrapper_Z3
 
-
 with open("../Models/json/SecureWebContainer.json", "r") as file:
     application = json.load(file)
 

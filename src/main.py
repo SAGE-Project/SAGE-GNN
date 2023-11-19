@@ -26,10 +26,8 @@ def read_jsons(path_to_dir):
             all_json_data.append(json_data)
     return all_json_data
 
-
 def without_keys(d, keys):
     return {k: v for k, v in d.items() if k not in keys}
-
 
 def get_node_features(component, restrictions, max_cpu, max_mem, max_storage, id):
     # normalize values
@@ -202,7 +200,7 @@ def split_into_batches(arr, batch_size):
 
 if __name__ == '__main__':
     print("BEFORE DIR READ")
-    data = read_jsons('Dataset_SecureWeb_DO_10K')
+    data = read_jsons('../Datasets/DsSecureWeb/')
     print("AFTER DIR READ")
 
     graphs = []
@@ -223,7 +221,7 @@ if __name__ == '__main__':
         # print(graph)
         dataset = DGLGraph(graph)
         dgl_graph = dataset[0]
-        dgl_graph = dgl_graph.to('cuda')
+        #dgl_graph = dgl_graph.to('cuda')
         # print_dataset(dgl_graph)
         dgl_graphs.append(dgl_graph)
 
@@ -239,7 +237,7 @@ if __name__ == '__main__':
     test = arr[size1 + size2:].tolist()
 
     model = Model(8, 10, 5, ['conflict', 'linked', 'unlinked'])
-    model = model.to('cuda')
+    #model = model.to('cuda')
     opt = torch.optim.Adam(model.parameters())
     loss_list = []
     loss_list_valid = []

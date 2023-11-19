@@ -1,6 +1,6 @@
 from z3 import *
-from Solvers.Formalization1.Z3.SMT_Solver_Z3 import Z3_Solver_Int_Parent
-from Solvers.Core.ManuverSolver_SB import ManuverSolver_SB
+from src.Solvers.Formalization1.Z3.SMT_Solver_Z3 import Z3_Solver_Int_Parent
+from src.Solvers.Core.ManuverSolver_SB import ManuverSolver_SB
 
 class Z3_SolverInt_SB_Enc_AllCombinationsOffers(Z3_Solver_Int_Parent, ManuverSolver_SB):
 
@@ -36,29 +36,44 @@ class Z3_SolverInt_SB_Enc_AllCombinationsOffers(Z3_Solver_Int_Parent, ManuverSol
     def _hardware_and_offers_restrictionns(self, scale_factor):
         #price restrictions
         for j in range(self.nrVM):
-            self.solver.add(self.PriceProv[j] >= 0)
             self.solver.add(
                 Implies(sum([self.a[i + j] for i in range(0, len(self.a), self.nrVM)]) == 0, self.PriceProv[j] == 0))
 
         #map vm to type
-        priceIndex = len(self.offers_list[0]) - 1
-        for vm_id in range(self.nrVM):
-            index = 0
-            for offer in self.offers_list:
-                index += 1
-                price = offer[priceIndex] if int(scale_factor) == 1 else offer[priceIndex] / scale_factor
-                self.solver.add(
-                    Implies(And(sum([self.a[i + vm_id] for i in range(0, len(self.a), self.nrVM)]) >= 1,
-                                self.vmType[vm_id] == index),
-                            And(self.PriceProv[vm_id] == price,
-                                self.ProcProv[vm_id] == offer[1],
-                                self.MemProv[vm_id] == (
-                                offer[2] if int(scale_factor) == 1 else offer[2] / scale_factor),
-                                self.StorageProv[vm_id] == (
-                                offer[3] if int(scale_factor) == 1 else offer[3] / scale_factor)
-                                )
-                            ))
-            lst = [self.vmType[vm_id] == offerID for offerID in range(1, len(self.offers_list)+1)]
+        # for j in range(self.nrVM):
+        #     self.solver.add(self.PriceProv[j] >= 0)
+        for k in range(len(self.offers_list)):
+            for j in range(self.nrVM):
+                self.solver.add(Implies(self.vmType[j] == k + 1,
+                                            And(self.PriceProv[j] == (
+                                            self.offers_list[k][len(self.offers_list[0]) - 1]),
+                                                self.ProcProv[j] == self.offers_list[k][1],
+                                                self.MemProv[j] == (self.offers_list[k][2]),
+                                                self.StorageProv[j] == (self.offers_list[k][3])
+                                                )
+                                            ))
+
+        # priceIndex = len(self.offers_list[0]) - 1
+        # for vm_id in range(self.nrVM):
+        #     index = 0
+        #     for offer in self.offers_list:
+        #         index += 1
+        #         price = offer[priceIndex] if int(scale_factor) == 1 else offer[priceIndex] / scale_factor
+        #         self.solver.add(
+        #             Implies(And(sum([self.a[i + vm_id] for i in range(0, len(self.a), self.nrVM)]) >= 1,
+        #                         self.vmType[vm_id] == index),
+        #                     And(self.PriceProv[vm_id] == price,
+        #                         self.ProcProv[vm_id] == offer[1],
+        #                         self.MemProv[vm_id] == (
+        #                         offer[2] if int(scale_factor) == 1 else offer[2] / scale_factor),
+        #                         self.StorageProv[vm_id] == (
+        #                         offer[3] if int(scale_factor) == 1 else offer[3] / scale_factor)
+        #                         )
+        #                     ))
+        #     lst = [self.vmType[vm_id] == offerID for offerID in range(0, len(self.offers_list)+1)]
+        #     self.solver.add(Or(lst))
+        for i in range(len(self.vmType)):
+            lst = [self.vmType[i] == t for t in range(0, len(self.offers_list) + 1)]
             self.solver.add(Or(lst))
 
         #map hardware

@@ -4,7 +4,6 @@ import src.smt
 import numpy as np
 import uuid
 
-
 def add_pred_soft_constraints(solver, prediction):
     # prediction is a matrix of size (nr comp) * (nr vms * nr offers)
     constraints = []
@@ -41,7 +40,6 @@ def add_pred_soft_constraints(solver, prediction):
     print("in wrapper_z3 add_pred_soft_constraints")
     solver.solver.add_soft(constraints)
 
-
 def add_pred_soft_constraints_sim(solver, prediction):
     for idx, vm_type in enumerate(prediction["output"]["types_of_VMs"]):
         solver.solver.add_soft(solver.vmType[idx] == vm_type)
@@ -49,9 +47,8 @@ def add_pred_soft_constraints_sim(solver, prediction):
     for idx, val in enumerate(a_matrix_flatten):
         solver.solver.add_soft(solver.a[idx] == val)
 
-
 class Wrapper_Z3:
-    def __init__(self, symmetry_breaker="FVPR", solver_id="z3"):
+    def __init__(self, symmetry_breaker="None", solver_id="z3"):
         self.symmetry_breaker = symmetry_breaker
         self.solver_id = solver_id
 

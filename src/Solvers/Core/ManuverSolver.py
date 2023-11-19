@@ -41,7 +41,7 @@ class ManuverSolver(object):
         print("Start evaluation")
 
     def _symmetry_breaking(self):
-        print("Parent class simetry breaking")
+        print("Parent class symetry breaking")
 
     def _hardware_and_offers_restrictionns(self, scale_factor=1):
         print("Parent class offers restrictions")
