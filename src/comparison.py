@@ -1,6 +1,6 @@
 import json
 import random
-from main import Model, RGCN, HeteroMLPPredictor
+from gnn import Model, RGCN, HeteroMLPPredictor
 from Wrapper_GNN import Wrapper_GNN
 from Wrapper_GNN_Z3 import Wrapper_GNN_Z3
 from Wrapper_Z3 import Wrapper_Z3

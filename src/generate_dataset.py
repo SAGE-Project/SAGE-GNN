@@ -11,7 +11,8 @@ with open("../Data/json/offers_20.json", "r") as file:
 # get all keys from the original object
 keys = list(offers_do.keys())
 
-# generate all possible combinations of 10 keys out of 20
+# generate all possible combinations of 10 keys out of 20 approx 180 k -> for Secure Web Container generate 20 k
+# Better r = 15 which leads to approx 15 k
 combos = itertools.combinations(keys, 10)
 
 offers_comb = []

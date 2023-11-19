@@ -3,7 +3,7 @@ import dgl
 import torch
 from Wrapper_Z3 import Wrapper_Z3
 from dgl_graph import DGLGraph
-from main import get_graph_data, to_assignment_matrix, count_matches_and_diffs
+from gnn import get_graph_data, to_assignment_matrix, count_matches_and_diffs
 
 
 class Wrapper_GNN:

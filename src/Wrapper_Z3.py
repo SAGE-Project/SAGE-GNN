@@ -48,7 +48,7 @@ def add_pred_soft_constraints_sim(solver, prediction):
         solver.solver.add_soft(solver.a[idx] == val)
 
 class Wrapper_Z3:
-    def __init__(self, symmetry_breaker="None", solver_id="z3"):
+    def __init__(self, symmetry_breaker="FVPR", solver_id="z3"):
         self.symmetry_breaker = symmetry_breaker
         self.solver_id = solver_id
 
@@ -75,9 +75,7 @@ class Wrapper_Z3:
 
         problem = ManeuverProblem()
         #print("DsWordpress instances ", problem.wpInst)
-        problem.readConfigurationJSON(
-            application_model_json, availableConfigurations, inst
-        )
+        problem.readConfigurationJSON(application_model_json, availableConfigurations, inst)
         if out:
             SMTsolver.init_problem(problem, "optimize", sb_option=self.symmetry_breaker,
                                    smt2lib="../Output/SMT-LIB/" + application_model_json["application"] + "_" + str(uuid.uuid4()))

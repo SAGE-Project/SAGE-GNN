@@ -1,5 +1,5 @@
 from z3 import *
-from Solvers.Core.ManuverSolver import ManuverSolver
+from src.Solvers.Core.ManuverSolver import ManuverSolver
 import time
 
 class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
@@ -434,7 +434,7 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         if self.solverTypeOptimize:
             opt = sum(self.PriceProv)
             min = self.solver.minimize(opt)
-        self.createSMT2LIBFile(self.smt2lib)
+        #self.createSMT2LIBFile(self.smt2lib)
 
         self.get_current_time()
 
@@ -451,7 +451,6 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
             #         "Constraint label: {} constraint description {}".format(str(cc), self.__constMap[cc]))
 
         self.problem.logger.info("Z3 status: {}".format(status))
-
 
         if status == sat:
             model = self.solver.model()
@@ -476,7 +475,8 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         if self.solverTypeOptimize:
             if status == sat:
                 #print("a_mat", a_mat)
-                self.createSMT2LIBFileSolution(self.smt2libsol, status, model)
+                # create corresponding SMT-LIB file
+                # self.createSMT2LIBFileSolution(self.smt2libsol, status, model)
                 # do not return min.value() since the type is not comparable with -1 in the exposeRE
                 return self.convert_price(min.value()), vms_price, stoptime - startime, a_mat, vms_type
             else:

@@ -371,7 +371,9 @@ if __name__ == '__main__':
     # plt.plot(range(epochs), acc_list, label='Accuracy')
     plt.xlabel('Epoch')
     plt.legend()
-    plt.show()
+    #plt.show()
+    plt.savefig(f'../plots/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
     plt.plot(range(epochs), acc_training_list, label='Training Accuracy')
@@ -379,7 +381,9 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.legend()
-    plt.show()
+    #plt.show()
+    plt.savefig(f'../plots/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.close()
 
     ###########################################################################################################################################################
     ######################################################################### TESTING #########################################################################
@@ -430,4 +434,6 @@ if __name__ == '__main__':
     acc_validation_list.append(accuracy)
     print("Testing accuracy:", accuracy)
 
-    torch.save(model, f'model_RGCN_%{epochs}_epochs.pth')
+    path_to_gnn_model = '../Models/GNNs'
+    gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs.pth'
+    torch.save(model, f'{path_to_gnn_model}/{gnn_model}')
