@@ -434,6 +434,6 @@ if __name__ == '__main__':
     acc_validation_list.append(accuracy)
     print("Testing accuracy:", accuracy)
 
-    path_to_gnn_model = '../Models/GNNs'
+    path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs.pth'
-    torch.save(model, f'{path_to_gnn_model}/{gnn_model}')
+    torch.save(model, f'../Models/GNNs/model_RGCN_{samples}_samples_{epochs}_epochs.pth')
