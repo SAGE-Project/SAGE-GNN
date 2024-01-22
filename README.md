@@ -22,46 +22,18 @@ By using these GNN-based predictions as soft constraints in Z3, we enhance searc
 
 1. **Dataset Generation:** 
    - Generate a dataset to train the GNN model for the application deployment.
-   - For a detailed look into the data generation process: 🔗 [src/generate_dataset](./src/generate_dataset.py)
+   - For a detailed look into the data generation process: 🔗 [src/generate_dataset.py](./src/generate_dataset.py)
 
 2. **GNN Model Implementation:**
    - Construct and train the GNN model able to predict component-to-VM assignments and VM Offer types.
    - Save trained model for future use.
-   - Explore the implementation: 🔗 [src/main](./src/main.py)
-   - 🔗 Saved Model: [src/trained_model_SecureWeb_DO.pth](./src/trained_model_SecureWeb_DO.pth)
+   - Explore the implementation: 🔗 [src/gnn.py](./src/gnn.py)
+   - 🔗 Saved Model: [Models/GNNs/SecureWebContainer/model_RGCN_50_samples_100_epochs.pth](./Models/GNNs/SecureWebContainer/model_RGCN_50_samples_100_epochs.pth)
 
 3. **Integration with SMT Solver Z3:**
    - Transform GNN predictions into soft constraints.
    - Guide the Z3 solver towards an optimal solution using these constraints.
-   - See: 🔗 [src/Wrapper_GNN_Z3](./src/Wrapper_GNN_Z3.py)
-
-
-    ```python
-    def add_pred_soft_constraints(solver, prediction):
-    # prediction is a matrix of size (nr comp) * (nr vms * nr offers)
-    constraints = []
-    nrOffers = solver.nrOffers
-    nrVms = solver.nrVM
-    nrComponents = solver.nrComp
-    for comp_idx in range(nrComponents):
-        pred_comp = prediction[comp_idx]
-        matrix = np.reshape(pred_comp, (nrOffers, nrVms))
-        for vm_idx in range(solver.nrVM):
-            pred_comp_vm = matrix[:, vm_idx]
-            placements = [i for i, x
-                            in enumerate(pred_comp_vm)
-                            if x == 1]
-            a_matrix_index = comp_idx * solver.nrVM + vm_idx
-            if len(placements) != 0:
-                constraints.append(solver.a[a_matrix_index] == 1)
-            else:
-                constraints.append(solver.a[a_matrix_index] == 0)
-            for placement in placements:
-                vmType = placement + 1
-                constraints.append(solver.vmType[vm_idx] == vmType)
-    constraints = list(set(constraints))
-    solver.solver.add_soft(constraints)
-    ```
+   - See: 🔗 [src/Wrapper_GNN_Z3.py](./src/Wrapper_GNN_Z3.py)
 
 ## Installation
 
@@ -100,11 +72,12 @@ Please ensure you have these dependencies installed and configured correctly bef
 
 ## Usage
 
-Using the already trained GNN model (trained_model_SecureWeb_DO.pth), the Wrappers and the Application Descriptions (Models/json) compare the results between the:
-
-- Z3 Solver
-- GNN model
-- Z3 Solver + GNN model integration
+Using the already trained GNN models (from Models/GNNs/SecureWebContainer/), and the SecureWebContainer descriptions (from Models/json/) compare the results between:
+   - Base, 
+   - Base+FVPR, 
+   - Base+GNN, 
+   - Base+GNN+FVPR
+   - See: 🔗 [src/comparison.py](./src/comparison.py)
 
 ## License
 
