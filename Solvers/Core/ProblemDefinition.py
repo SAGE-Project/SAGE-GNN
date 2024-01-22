@@ -1,12 +1,12 @@
 import json
 import numpy
-from src.Solvers.Core.Restrictions.RestrictionConflicts import RestrictionConflict, RestrictionAlphaOrBeta
-from src.Solvers.Core.Restrictions.RestrictionDependences import RestrictionOneToOneDependency, \
+from Solvers.Core.Restrictions.RestrictionConflicts import RestrictionConflict, RestrictionAlphaOrBeta
+from Solvers.Core.Restrictions.RestrictionDependences import RestrictionOneToOneDependency, \
     RestrictionOneToManyDependency, RestrictionManyToManyDependency, RestrictionManyToManyDependencyNew
-from src.Solvers.Core.Restrictions.RestrictionNumberOfInstances import RestrictionUpperLowerEqualBound, \
+from Solvers.Core.Restrictions.RestrictionNumberOfInstances import RestrictionUpperLowerEqualBound, \
     RestrictionRangeBound, RestrictionFullDeployment, RestrictionRequireProvideDependency
-from src.Solvers.Core.Component import Component
-from src.Solvers.Core.conflictGraph import getMaxClique
+from Solvers.Core.Component import Component
+from Solvers.Core.conflictGraph import getMaxClique
 import logging
 
 class ManeuverProblem:
@@ -96,7 +96,7 @@ class ManeuverProblem:
         :return:
         """
         self.logger.info("Find number of needed virtual machines based on components number restrictions")
-        from src.Solvers.Core.CP_Solver_Number_of_Instances import CP_Solver_Got_Nr_Instances
+        from Solvers.Core.CP_Solver_Number_of_Instances import CP_Solver_Got_Nr_Instances
         cpSolver = CP_Solver_Got_Nr_Instances(self, choosing_stategy, solutions_limit)
 
         for restriction in self.restrictionsList:

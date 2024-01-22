@@ -1,5 +1,5 @@
 from z3 import *
-from src.Solvers.Core.ManuverSolver import ManuverSolver
+from Solvers.Core.ManuverSolver import ManuverSolver
 import time
 
 class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
@@ -14,6 +14,7 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         else:
             self.solver = Solver()
             self.solver.set(unsat_core=True)
+            #self.solver.set("sat.cardinality.solver", True)
             self.labelIdx = 0
             self.labelIdx_oneToOne = 0
             self.labelIdx_offer = 0
@@ -434,7 +435,7 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         if self.solverTypeOptimize:
             opt = sum(self.PriceProv)
             min = self.solver.minimize(opt)
-        #self.createSMT2LIBFile(self.smt2lib)
+        self.createSMT2LIBFile(self.smt2lib)
 
         self.get_current_time()
 
@@ -474,9 +475,9 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
             print("UNSAT")
         if self.solverTypeOptimize:
             if status == sat:
-                #print("a_mat", a_mat)
+                print("a_mat", a_mat)
                 # create corresponding SMT-LIB file
-                # self.createSMT2LIBFileSolution(self.smt2libsol, status, model)
+                self.createSMT2LIBFileSolution(self.smt2libsol, status, model)
                 # do not return min.value() since the type is not comparable with -1 in the exposeRE
                 return self.convert_price(min.value()), vms_price, stoptime - startime, a_mat, vms_type
             else:

@@ -39,9 +39,9 @@ def getSolver(solver, formalization: int = 1):
         if solver == "z3":
             from Solvers.Formalization1.Z3.SMT_Solver_Z3_Int_SB_AllCombinationsOffers import Z3_SolverInt_SB_Enc_AllCombinationsOffers
             return Z3_SolverInt_SB_Enc_AllCombinationsOffers()
-        elif solver == "cplex":
-            from Solvers.Formalization1.CPLEX.CP_CPLEX_Solver_Enc_AllCombinationsOffers import CPlex_Solver_SB_Enc_AllCombinationsOffers
-            return CPlex_Solver_SB_Enc_AllCombinationsOffers()
+        # elif solver == "cplex":
+        #     from Solvers.Formalization1.CPLEX.CP_CPLEX_Solver_Enc_AllCombinationsOffers import CPlex_Solver_SB_Enc_AllCombinationsOffers
+        #     return CPlex_Solver_SB_Enc_AllCombinationsOffers()
     # elif formalization == 2:
     #     if solver == "z3":
     #         from Solvers.Formalization2.Z3.SMT_Solver_Z3_Int_SB_AllCombinationsOffers import Z3_SolverInt_SB_Enc_AllCombinationsOffers

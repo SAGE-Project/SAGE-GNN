@@ -19,7 +19,7 @@ def read_jsons(path_to_dir):
     index = 0
     for file_name in os.listdir(path_to_dir):
         index = index + 1
-        print(f"DURING DIR READ {index}")
+        #print(f"DURING DIR READ {index}")
         file_path = f'{path_to_dir}/{file_name}'
         with open(file_path, 'r', encoding='utf-8-sig') as json_file:
             json_data = json.load(json_file)
@@ -93,14 +93,14 @@ def get_graph_data(json_data, file_name):
         if memory > max_mem: max_mem = memory
         if storage > max_storage: max_storage = storage
     for vm_type in json_data['output']['types_of_VMs']:
-        print("---> ", [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type])
+        #print("---> ", [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type])
         if ([vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type] != []):
             vm_specs = [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type][0]
             cpu = list(vm_specs.values())[0]["cpu"]
             memory = list(vm_specs.values())[0]["memory"]
             storage = list(vm_specs.values())[0]["storage"]
             price = list(vm_specs.values())[0]["price"]
-            print("cpu ",cpu)
+            #print("cpu ",cpu)
             if cpu > max_cpu: max_cpu = cpu
             if memory > max_mem: max_mem = memory
             if storage > max_storage: max_storage = storage
@@ -203,27 +203,27 @@ def split_into_batches(arr, batch_size):
 
 
 if __name__ == '__main__':
-    print("BEFORE DIR READ")
-    data = read_jsons('../Datasets/DsSecureWeb')
-    print("AFTER DIR READ")
+    #print("BEFORE DIR READ")
+    data = read_jsons('../Datasets/DsSecureWebContainer')
+    #print("AFTER DIR READ")
 
     graphs = []
     index = 0
-    samples = 50
+    samples = 10000
     for json_graph_data in data[:samples]:
         index = index + 1
-        print(f"DURING Graphs construct {index}")
+        #print(f"DURING Graphs construct {index}")
         filename = json_graph_data['filename']
         graphs.append(get_graph_data(json_graph_data, filename))
 
     dgl_graphs = []
     index = 0
 
-    print("len graphs ", len(graphs))
+    #print("len graphs ", len(graphs))
 
     for graph in graphs:
         index = index + 1
-        print(f"DURING Graphs dgl convert cuda {index}")
+        #print(f"DURING Graphs dgl convert cuda {index}")
         # print('\n\nGraph Nodes AND Edges')
         # print(graph)
         dataset = DGLGraph(graph)
@@ -257,13 +257,12 @@ if __name__ == '__main__':
     loss_func = FocalLoss(weights=class_weights, gamma=0.7)
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 100
+    epochs = 200
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
         ###########################################################################################################################################################
         # set the model to train mode
-
         model.train()
 
         # create empty lists to store the predictions and true labels
@@ -311,7 +310,7 @@ if __name__ == '__main__':
             opt.step()
 
         loss_list.append(loss_list_batch[0])
-        print(loss_list_batch[0])
+        #print(loss_list_batch[0])
 
         # concatenate the predictions and true labels into tensors
         y_pred = torch.cat(y_pred)
@@ -359,12 +358,12 @@ if __name__ == '__main__':
         # compute the accuracy of the model on the validation set
         accuracy = (y_pred_val == y_true_val).float().mean().item()
         acc_validation_list.append(accuracy)
-        print("Validation accuracy:", accuracy)
+        #print("Validation accuracy:", accuracy)
 
     stoptime = time.time()
     print("training time ", stoptime - startime)
-    print(loss_list)
-    print(loss_list_valid)
+    #print(loss_list)
+    #print(loss_list_valid)
 
     plt.plot(range(epochs), loss_list, label='Loss Train')
     plt.plot(range(epochs), loss_list_valid, label='Loss Valid')
@@ -372,7 +371,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/SecureWebContainer/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -382,7 +381,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/SecureWebContainer/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -396,12 +395,12 @@ if __name__ == '__main__':
     model.eval()
 
     # loop over the test graphs and compute the predictions and true labels
-    print("len test ", len(test))
+    #print("len test ", len(test))
     matchesCount = 0
     diffsCount = 0
     for test_graph in test:
         dec_graph = test_graph['component', :, 'vm']
-        print(dec_graph)
+        #print(dec_graph)
 
         edge_label = dec_graph.edata[dgl.ETYPE]
         comp_feats = test_graph.nodes['component'].data['feat']
@@ -417,10 +416,10 @@ if __name__ == '__main__':
                                                  [element for row in assingnament_actual for element in row])
         matchesCount += matches
         diffsCount += diffs
-        print(f"{matches} values match; {diffs} don't")
-        print(f"Prediction {assingnament_pred}")
+        #print(f"{matches} values match; {diffs} don't")
+        #print(f"Prediction {assingnament_pred}")
         y_true.append(edge_label)
-        print(f"Actual {assingnament_actual}")
+        #print(f"Actual {assingnament_actual}")
 
     matchesCount /= len(test)
     diffsCount /=len(test)
@@ -436,4 +435,4 @@ if __name__ == '__main__':
 
     path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs.pth'
-    torch.save(model, f'../Models/GNNs/model_RGCN_{samples}_samples_{epochs}_epochs.pth')
+    torch.save(model, f'../Models/GNNs/SecureWebContainer/model_RGCN_{samples}_samples_{epochs}_epochs.pth')

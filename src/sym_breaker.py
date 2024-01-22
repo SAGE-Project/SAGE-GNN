@@ -124,6 +124,7 @@ def getSymmetryBreakerConstraints(sym_breaker: str, use_case: str, scaling_compo
     """
     constraints = []
     start = 0
+    print("getSymmetryBreakerConstraints")
 
     if sym_breaker.startswith("FV"):
         output = getFVConstraints(use_case, scaling_components)

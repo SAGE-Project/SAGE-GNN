@@ -2,7 +2,7 @@ import itertools
 import json
 from Wrapper_Z3 import Wrapper_Z3
 
-with open("../Models/json/SecureWebContainer.json", "r") as file:
+with open("../Models/json/SecureBillingEmail.json", "r") as file:
     application = json.load(file)
 
 with open("../Data/json/offers_20.json", "r") as file:
@@ -26,11 +26,11 @@ for combo in combos:
 index = 0
 for offer in offers_comb:
     wrapper = Wrapper_Z3()
-    with open("../Models/json/SecureWebContainer.json", "r") as file:
+    with open("../Models/json/SecureBillingEmail.json", "r") as file:
         application = json.load(file)
     result = wrapper.solve(application, offer)
     if result:
         index = index + 1
-        with open(f"../Datasets/DsSecureWeb/{application['application']}_{index}.json", "w") as outfile:
+        with open(f"../Datasets/DsSecureBilling/{application['application']}_{index}.json", "w") as outfile:
             # Write the JSON data to the file
             json.dump(result, outfile, indent=4)

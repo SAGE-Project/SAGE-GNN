@@ -28,6 +28,9 @@ class ManuverSolver(object):
         self.use_vm_vector_in_encoding = use_vm_vector_in_encoding
         self.offers_list_filtered = offers_list_filtered
         self.default_offers_encoding = default_offers_encoding
+
+        print("self.sb_option ", self.sb_option)
+
         self._initSolver()
 
         self._symmetry_breaking()
