@@ -71,7 +71,8 @@ class Wrapper_Z3:
             prediction=None,
             prediction_sim=None,
             inst=0,
-            out=True
+            #out=True
+            out=False
     ):
         SMTsolver = src.smt.getSolver(self.solver_id)
         availableConfigurations = []

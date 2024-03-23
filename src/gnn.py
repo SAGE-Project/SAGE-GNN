@@ -3,6 +3,7 @@ import json
 import dgl
 import torch
 import time
+import random
 
 import numpy as np
 from graph import Node, Graph
@@ -53,7 +54,6 @@ def get_node_features(component, restrictions, max_cpu, max_mem, max_storage, id
 
     return [id/4, cpu, memory, storage, full_deploy, upper_b, lower_b, eq_b]
 
-
 def get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage):
     component_nodes = []
     for id,component in enumerate(json_data['components']):
@@ -61,7 +61,6 @@ def get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage):
         component_node = Node(component['id'], features, "component")
         component_nodes.append(component_node)
     return component_nodes
-
 
 def get_vm_nodes(json_data, starting_index, max_cpu, max_mem, max_storage, max_price, surrogate_result):
     vm_nodes = []
@@ -79,7 +78,6 @@ def get_vm_nodes(json_data, starting_index, max_cpu, max_mem, max_storage, max_p
             idx = idx + 1
     return vm_nodes
 
-
 def get_graph_data(json_data, file_name):
     restrictions = json_data["restrictions"]
     assign = json_data["output"]["assign_matr"]
@@ -96,6 +94,7 @@ def get_graph_data(json_data, file_name):
         #print("---> ", [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type])
         if ([vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type] != []):
             vm_specs = [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type][0]
+            #print("vm_specs ", vm_specs)
             cpu = list(vm_specs.values())[0]["cpu"]
             memory = list(vm_specs.values())[0]["memory"]
             storage = list(vm_specs.values())[0]["storage"]
@@ -111,7 +110,6 @@ def get_graph_data(json_data, file_name):
     vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
                             surrogate_result)
     return Graph(file_name, component_nodes, vm_nodes, restrictions, assign, json_data["output"], surrogate_result)
-
 
 class HeteroMLPPredictor(nn.Module):
     def __init__(self, in_dims, n_classes):
@@ -131,7 +129,6 @@ class HeteroMLPPredictor(nn.Module):
             graph.apply_edges(self.apply_edges)
             return graph.edata['score']
 
-
 class Model(nn.Module):
     def __init__(self, in_features, hidden_features, out_features, rel_names):
         super().__init__()
@@ -141,7 +138,6 @@ class Model(nn.Module):
     def forward(self, g, x, dec_graph):
         h = self.sage(g, x)
         return self.pred(dec_graph, h)
-
 
 class RGCN(nn.Module):
     def __init__(self, in_feats, hid_feats, out_feats, rel_names):
@@ -160,7 +156,6 @@ class RGCN(nn.Module):
         h = self.conv2(graph, h)
         return h
 
-
 def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
     vms_nr = int(len(tensor) / components_nr)
     assign_matrix = [[0 for _ in range(vms_nr)] for _ in range(components_nr)]
@@ -177,7 +172,6 @@ def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
         else:
             assign_matrix[component][vm] = 1
     return assign_matrix
-
 
 def count_matches_and_diffs(list1, list2):
     # Ensure the lists have the same length
@@ -197,10 +191,8 @@ def count_matches_and_diffs(list1, list2):
 
     return matches, diffs
 
-
 def split_into_batches(arr, batch_size):
     return [arr[i:i + batch_size] for i in range(0, len(arr), batch_size)]
-
 
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
@@ -209,7 +201,7 @@ if __name__ == '__main__':
 
     graphs = []
     index = 0
-    samples = 10000
+    samples = 15501
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
@@ -233,16 +225,31 @@ if __name__ == '__main__':
         dgl_graphs.append(dgl_graph)
 
     arr = np.array(dgl_graphs)
-    # Calculate the sizes of the three parts
+    # Calculate the sizes of the train, validation, test sets and take random indexes (function shuffle) for contracting them
     n = len(arr)
-    size1 = int(0.6 * n)
-    size2 = int(0.2 * n)
+    data = list(range(0, n))
+    random.shuffle(data)
+    sizeTrain = int(0.6 * n)
+    sizeValidation = int(0.2 * n)
+    sizeTest = len(data) - sizeValidation - sizeValidation
+    train = []
+    validation = []
+    test = []
 
-    # Split the array into three parts
-    train = arr[:size1].tolist()
-    validation = arr[size1:size1 + size2].tolist()
-    test = arr[size1 + size2:].tolist()
+    # Split the array into three parts randomly
+    for i in range(sizeTrain):
+        train.append(arr[data[i]])
+    for i in range(sizeTrain+sizeValidation):
+        validation.append(arr[data[i]])
+    for i in range(sizeTrain+sizeValidation, len(data)):
+        test.append(arr[data[i]])
 
+    # train = arr[:size1].tolist()
+    # validation = arr[size1:size1 + size2].tolist()
+    # test = arr[size1 + size2:].tolist()
+
+    # 8 features of component nodes. We also have VM nodes! ???
+    # 5 components ???
     model = Model(8, 10, 5, ['conflict', 'linked', 'unlinked'])
     #model = model.to('cuda')
     opt = torch.optim.Adam(model.parameters())
