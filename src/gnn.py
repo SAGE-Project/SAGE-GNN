@@ -107,6 +107,7 @@ def get_graph_data(json_data, file_name):
 
     #surrogate_result = 6 # Secure Web Container
     surrogate_result = 5  # Secure Billing Email
+    #surrogate_result = 11  # Oryx2
     component_nodes = get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage)
     vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
                             surrogate_result)
@@ -197,13 +198,13 @@ def split_into_batches(arr, batch_size):
 
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
-    data = read_jsons('../Datasets/DsSecureBillingEmail')
+    data = read_jsons('../Datasets/DsOryx2')
     #print("AFTER DIR READ")
 
     graphs = []
     index = 0
     #samples = 15501
-    samples = 1000
+    samples = 50
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
@@ -269,7 +270,7 @@ if __name__ == '__main__':
     loss_func = FocalLoss(weights=class_weights, gamma=0.7) # if gamma=0 then cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 100
+    epochs = 400
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
@@ -383,7 +384,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/SecureBillingEmail/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/Oryx2/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -393,7 +394,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/SecureBillingEmail/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/Oryx2/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -422,6 +423,7 @@ if __name__ == '__main__':
             logits = model(test_graph, node_features, dec_graph)
         pred = logits.argmax(dim=-1)
         y_pred.append(pred)
+        #last argument is the # of components of the application
         assingnament_pred = to_assignment_matrix(test_graph, dec_graph, pred, 5)
         assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 5)
         matches, diffs = count_matches_and_diffs([element for row in assingnament_pred for element in row],
@@ -447,4 +449,4 @@ if __name__ == '__main__':
 
     path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs.pth'
-    torch.save(model, f'../Models/GNNs/SecureBillingEmail/model_RGCN_{samples}_samples_{epochs}_epochs.pth')
+    torch.save(model, f'../Models/GNNs/Oryx2/model_RGCN_{samples}_samples_{epochs}_epochs.pth')

@@ -7,7 +7,8 @@ from gnn import get_graph_data, to_assignment_matrix, count_matches_and_diffs
 
 
 class Wrapper_GNN:
-    def __init__(self, model_path="../Models/GNNs/model_RGCN_100_samples_300_epochs.pth"):
+    def __init__(self, model_path="../Models/GNNs/SecureBillingEmail/model_RGCN_100_samples_300_epochs.pth"):
+        print("in Wrapper_GNN")
         # load pre-existing trained model
         self.model = torch.load(model_path)
         # set the model to evaluation mode
