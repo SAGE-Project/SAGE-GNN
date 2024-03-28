@@ -105,7 +105,8 @@ def get_graph_data(json_data, file_name):
             if storage > max_storage: max_storage = storage
             if price > max_price: max_price = price
 
-    surrogate_result = 6 # Secure Web Container
+    #surrogate_result = 6 # Secure Web Container
+    surrogate_result = 5  # Secure Billing Email
     component_nodes = get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage)
     vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
                             surrogate_result)
@@ -196,12 +197,13 @@ def split_into_batches(arr, batch_size):
 
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
-    data = read_jsons('../Datasets/DsSecureWebContainer')
+    data = read_jsons('../Datasets/DsSecureBillingEmail')
     #print("AFTER DIR READ")
 
     graphs = []
     index = 0
-    samples = 15501
+    #samples = 15501
+    samples = 1000
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
@@ -225,10 +227,13 @@ if __name__ == '__main__':
         dgl_graphs.append(dgl_graph)
 
     arr = np.array(dgl_graphs)
-    # Calculate the sizes of the train, validation, test sets and take random indexes (function shuffle) for contracting them
+    # Calculate the sizes of the train, validation, test sets and take random indexes (function shuffle) for train, test, validate
     n = len(arr)
+    #print("n=", n)
     data = list(range(0, n))
+    #print("data before ", data)
     random.shuffle(data)
+    #print("data after ", data)
     sizeTrain = int(0.6 * n)
     sizeValidation = int(0.2 * n)
     sizeTest = len(data) - sizeValidation - sizeValidation
@@ -261,10 +266,10 @@ if __name__ == '__main__':
 
     class_weights = torch.FloatTensor([0.0, 0.9, 0.1])
     #class_weights = class_weights.to('cuda')
-    loss_func = FocalLoss(weights=class_weights, gamma=0.7)
+    loss_func = FocalLoss(weights=class_weights, gamma=0.7) # if gamma=0 then cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 200
+    epochs = 100
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
@@ -378,7 +383,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/SecureWebContainer/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/SecureBillingEmail/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -388,7 +393,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/SecureWebContainer/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/SecureBillingEmail/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -442,4 +447,4 @@ if __name__ == '__main__':
 
     path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs.pth'
-    torch.save(model, f'../Models/GNNs/SecureWebContainer/model_RGCN_{samples}_samples_{epochs}_epochs.pth')
+    torch.save(model, f'../Models/GNNs/SecureBillingEmail/model_RGCN_{samples}_samples_{epochs}_epochs.pth')
