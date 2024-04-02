@@ -5,7 +5,7 @@ from Wrapper_GNN import Wrapper_GNN
 from Wrapper_GNN_Z3 import Wrapper_GNN_Z3
 from Wrapper_Z3 import Wrapper_Z3
 
-with open("../Models/json/SecureBillingEmail-Mem-LoadBalancer-7500.json", "r") as file:
+with open("../Models/json/Oryx2.json", "r") as file:
     application = json.load(file)
 
 with open("../Data/json/offers_500.json", "r") as file:

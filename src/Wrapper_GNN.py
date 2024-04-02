@@ -7,7 +7,7 @@ from gnn import get_graph_data, to_assignment_matrix, count_matches_and_diffs
 
 
 class Wrapper_GNN:
-    def __init__(self, model_path="../Models/GNNs/SecureBillingEmail/model_RGCN_100_samples_300_epochs.pth"):
+    def __init__(self, model_path="../Models/GNNs/Oryx2/model_RGCN_10000_samples_50_epochs.pth"):
         print("in Wrapper_GNN")
         # load pre-existing trained model
         self.model = torch.load(model_path)
@@ -39,8 +39,8 @@ class Wrapper_GNN:
             logits = self.model(dgl_graph, node_features, dec_graph)
         pred = logits.argmax(dim=-1)
         y_pred.append(pred)
-        assignment_pred = to_assignment_matrix(dgl_graph, dec_graph, pred, 5)
-        assignment_actual = to_assignment_matrix(dgl_graph, dec_graph, edge_label, 5)
+        assignment_pred = to_assignment_matrix(dgl_graph, dec_graph, pred, 10)
+        assignment_actual = to_assignment_matrix(dgl_graph, dec_graph, edge_label, 10)
         matches, diffs = count_matches_and_diffs([element for row in assignment_pred for element in row],
                                                  [element for row in assignment_actual for element in row])
         print(f"{matches} values match; {diffs} don't")

@@ -3,7 +3,7 @@ from Wrapper_Z3 import Wrapper_Z3
 
 
 class Wrapper_GNN_Z3:
-    def __init__(self, model_path="../Models/GNNs/SecureBillingEmail/model_RGCN_100_samples_300_epochs.pth", symmetry_breaker="None"):
+    def __init__(self, model_path="../Models/GNNs/Oryx2/model_RGCN_10000_samples_50_epochs.pth", symmetry_breaker="None"):
         print("in Wrapper_GNN_Z3")
         self.gnn_predictor = Wrapper_GNN(model_path=model_path)
         self.symmetry_breaker = symmetry_breaker

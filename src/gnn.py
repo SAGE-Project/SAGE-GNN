@@ -106,8 +106,8 @@ def get_graph_data(json_data, file_name):
             if price > max_price: max_price = price
 
     #surrogate_result = 6 # Secure Web Container
-    surrogate_result = 5  # Secure Billing Email
-    #surrogate_result = 11  # Oryx2
+    # surrogate_result = 5  # Secure Billing Email
+    surrogate_result = 11  # Oryx2
     component_nodes = get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage)
     vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
                             surrogate_result)
@@ -204,7 +204,7 @@ if __name__ == '__main__':
     graphs = []
     index = 0
     #samples = 15501
-    samples = 50
+    samples = 10000
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
@@ -270,7 +270,7 @@ if __name__ == '__main__':
     loss_func = FocalLoss(weights=class_weights, gamma=0.7) # if gamma=0 then cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 400
+    epochs = 50
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
@@ -423,9 +423,9 @@ if __name__ == '__main__':
             logits = model(test_graph, node_features, dec_graph)
         pred = logits.argmax(dim=-1)
         y_pred.append(pred)
-        #last argument is the # of components of the application
-        assingnament_pred = to_assignment_matrix(test_graph, dec_graph, pred, 5)
-        assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 5)
+        #last argument is the # of components of the application, Oryx2=10
+        assingnament_pred = to_assignment_matrix(test_graph, dec_graph, pred, 10)
+        assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 10)
         matches, diffs = count_matches_and_diffs([element for row in assingnament_pred for element in row],
                                                  [element for row in assingnament_actual for element in row])
         matchesCount += matches
