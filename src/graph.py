@@ -105,8 +105,10 @@ class Graph:
                     self.links.append(link)
 
         for comp in component_nodes:
+            print("len(component_nodes)", len(component_nodes))
             for vm in vm_nodes:
                 if not links_exists.get(comp.id).get(vm.id):
+                    print("vm, comp", vm, comp)
                     link = Edge(comp, vm, 0)
                     self.links.append(link)
 

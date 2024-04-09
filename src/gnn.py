@@ -65,8 +65,10 @@ def get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage):
 def get_vm_nodes(json_data, starting_index, max_cpu, max_mem, max_storage, max_price, surrogate_result):
     vm_nodes = []
     idx = 0
+    print("???", len(json_data['output']['offers'].keys()))
     for vm_type in json_data['output']['offers'].keys():
         vm_specs = json_data['output']['offers'][vm_type]
+
         vm_features = [
             vm_specs["cpu"] / max_cpu,
             vm_specs["memory"] / max_mem,
@@ -74,6 +76,7 @@ def get_vm_nodes(json_data, starting_index, max_cpu, max_mem, max_storage, max_p
             vm_specs["price"] / max_price
         ]
         for i in range(surrogate_result):
+            print("idx", idx)
             vm_nodes.append(Node(starting_index + idx, vm_features + [(i + 1) / surrogate_result], "vm"))
             idx = idx + 1
     return vm_nodes
@@ -107,10 +110,16 @@ def get_graph_data(json_data, file_name):
 
     #surrogate_result = 6 # Secure Web Container
     # surrogate_result = 5  # Secure Billing Email
-    surrogate_result = 11  # Oryx2
+    #surrogate_result = 11  #Oryx2
+    surrogate_result = 8  # Wordpress3
+    #surrogate_result = 10  # Wordpress4
+    # component_nodes represent the nodes with first indexes
     component_nodes = get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage)
+    print("component_nodes ", component_nodes)
+    # after component_nodes the vm_nodes are indexed. The number of vm_nodes is surrogate_result*
     vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
                             surrogate_result)
+    print("vm_nodes", vm_nodes)
     return Graph(file_name, component_nodes, vm_nodes, restrictions, assign, json_data["output"], surrogate_result)
 
 class HeteroMLPPredictor(nn.Module):
@@ -198,13 +207,13 @@ def split_into_batches(arr, batch_size):
 
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
-    data = read_jsons('../Datasets/DsOryx2')
+    data = read_jsons('../Datasets/DsWordpress3')
     #print("AFTER DIR READ")
 
     graphs = []
     index = 0
     #samples = 15501
-    samples = 10000
+    samples = 50
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
@@ -270,7 +279,7 @@ if __name__ == '__main__':
     loss_func = FocalLoss(weights=class_weights, gamma=0.7) # if gamma=0 then cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 50
+    epochs = 100
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
@@ -384,7 +393,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/Oryx2/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/Wordpress3/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -394,7 +403,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/Oryx2/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
+    plt.savefig(f'../plots/Wordpress3/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -424,8 +433,9 @@ if __name__ == '__main__':
         pred = logits.argmax(dim=-1)
         y_pred.append(pred)
         #last argument is the # of components of the application, Oryx2=10
-        assingnament_pred = to_assignment_matrix(test_graph, dec_graph, pred, 10)
-        assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 10)
+        # last argument is the # of components of the application, Wordpress3=5
+        assingnament_pred = to_assignment_matrix(test_graph, dec_graph, pred, 5)
+        assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 5)
         matches, diffs = count_matches_and_diffs([element for row in assingnament_pred for element in row],
                                                  [element for row in assingnament_actual for element in row])
         matchesCount += matches
@@ -449,4 +459,4 @@ if __name__ == '__main__':
 
     path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs.pth'
-    torch.save(model, f'../Models/GNNs/Oryx2/model_RGCN_{samples}_samples_{epochs}_epochs.pth')
+    torch.save(model, f'../Models/GNNs/Wordpress3/model_RGCN_{samples}_samples_{epochs}_epochs.pth')

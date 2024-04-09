@@ -70,7 +70,7 @@ class Wrapper_Z3:
             offers_json,
             prediction=None,
             prediction_sim=None,
-            inst=0,
+            inst=3,
             #out=True
             out=False
     ):

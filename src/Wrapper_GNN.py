@@ -7,7 +7,7 @@ from gnn import get_graph_data, to_assignment_matrix, count_matches_and_diffs
 
 
 class Wrapper_GNN:
-    def __init__(self, model_path="../Models/GNNs/Oryx2/model_RGCN_10000_samples_50_epochs.pth"):
+    def __init__(self, model_path="../Models/GNNs/???/model_RGCN_10000_samples_50_epochs.pth"):
         print("in Wrapper_GNN")
         # load pre-existing trained model
         self.model = torch.load(model_path)

@@ -129,6 +129,7 @@ class ManeuverProblem:
 
         orComponents = set()
         for restriction in dictionary["restrictions"]:
+            print("inst=",inst)
             if inst != 0:
                 if restriction["type"] == "LowerBound" and restriction["bound"] == -1:
                     restriction["bound"] = inst
