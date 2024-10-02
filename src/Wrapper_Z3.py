@@ -70,9 +70,9 @@ class Wrapper_Z3:
             offers_json,
             prediction=None,
             prediction_sim=None,
-            inst=3,
-            #out=True
-            out=False
+            # inst != 0 only for Wordpress
+            inst=0,
+            out=True
     ):
         SMTsolver = src.smt.getSolver(self.solver_id)
         availableConfigurations = []

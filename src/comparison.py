@@ -5,10 +5,10 @@ from Wrapper_GNN import Wrapper_GNN
 from Wrapper_GNN_Z3 import Wrapper_GNN_Z3
 from Wrapper_Z3 import Wrapper_Z3
 
-with open("../Models/json/???.json", "r") as file:
+with open("../Models/json/SecureWebContainer.json", "r") as file:
     application = json.load(file)
 
-with open("../Data/json/offers_500.json", "r") as file:
+with open("../Data/json/DigitalOcean.json", "r") as file:
     offers_do = json.load(file)
 
 #1.
@@ -19,7 +19,7 @@ with open("../Data/json/offers_500.json", "r") as file:
 # wrapper_z3 = Wrapper_Z3(symmetry_breaker="FVPR")
 # print(wrapper_z3.solve(application, offers_do))
 
-# 3.
+# # 3.
 # wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="None")
 # print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn"))
 

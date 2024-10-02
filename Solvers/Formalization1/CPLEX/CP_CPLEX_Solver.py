@@ -69,7 +69,7 @@ class CPlex_Solver_Parent(ManuverSolver):
     def run(self):
         objective = self.model.sum(self.PriceProv[j] for j in range(self.nr_vms))
         self.model.minimize(objective)
-        #       self.model.prettyprint("out")
+        #       self.model.prettyprint("out_oryx2")
         self.model.export_as_lp(self.cplexLPPath)
         #       self.model.export_as_mps("nou")
 

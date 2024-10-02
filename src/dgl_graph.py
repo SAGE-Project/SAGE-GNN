@@ -11,6 +11,7 @@ class DGLGraph(DGLDataset):
     def process(self):
         components_src = []
         components_dest = []
+        #print("self.graph_init.edges ", self.graph_init.edges)
         for edge in self.graph_init.edges:
             components_src.append(edge.node1.id - 1)
             components_dest.append(edge.node2.id - 1)
@@ -29,14 +30,19 @@ class DGLGraph(DGLDataset):
             else:
                 unlink_src.append(link.node1.id - 1)
                 unlink_dest.append(link.node2.id - self.graph_init.vm_index_start)
+        # print("link_src ", link_src)
+        # print("link_dest ", link_dest)
 
         deployed_src = [j for j in range(size_components) for i in range(size_vms)]
         deployed_dest = [j for i in range(size_components) for j in range(size_vms)]
+
         self.graph = dgl.heterograph({
             ('component', 'conflict', 'component'): (torch.tensor(components_src), torch.tensor(components_dest)), # component linkedCC
             ('component', 'linked', 'vm'): (torch.tensor(link_src), torch.tensor(link_dest)), # component linkedCM
             ('component', 'unlinked', 'vm'): (torch.tensor(unlink_src), torch.tensor(unlink_dest))  # component unlinkedCM
         })
+        # print("self", self.graph)
+
         features_components = [x.features for x in self.graph_init.nodes if x.get_type() == "component"]
         features_vms = [x.features for x in self.graph_init.nodes if x.get_type() == "vm"]
 
