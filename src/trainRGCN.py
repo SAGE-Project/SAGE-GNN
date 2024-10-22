@@ -116,12 +116,20 @@ def get_graph_data(json_data, file_name):
 class HeteroMLPPredictor(nn.Module):
     def __init__(self, in_dims, n_classes):
         super().__init__()
-        self.W = nn.Linear(in_dims * 2, n_classes)
+        self.fc1 = nn.Linear(in_dims * 2, 300)  # First layer
+        self.fc2 = nn.Linear(300, 300)  # Second layer
+        self.fc3 = nn.Linear(300, n_classes)  # Third layer (output)
 
     def apply_edges(self, edges):
-        x = torch.cat([edges.src['h'], edges.dst['h']], 1)
-        y = self.W(x)
+        x = torch.cat([edges.src['h'], edges.dst['h']], 1)  # Concatenate source and destination node features
+        x = self.fc1(x)  # Apply first layer with .... no ReLU
+        x = self.fc2(x)  # Apply second layer with .... no ReLU
+        y = self.fc3(x)  # Apply third (output) layer
         return {'score': y}
+
+        # x = torch.cat([edges.src['h'], edges.dst['h']], 1)
+        # y = self.W(x)
+        # return {'score': y}
 
     def forward(self, graph, h):
         # h contains the node representations for each edge type computed from
@@ -133,9 +141,9 @@ class HeteroMLPPredictor(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, in_features, hidden_features1, hidden_features2, out_features, rel_names):
+    def __init__(self, in_features, hidden_features, out_features, rel_names):
         super().__init__()
-        self.sage = RGCN(in_features, hidden_features1, hidden_features2, out_features, rel_names)
+        self.sage = RGCN(in_features, hidden_features, out_features, rel_names)
         self.pred = HeteroMLPPredictor(out_features, len(rel_names))
 
     def forward(self, g, x, dec_graph):
@@ -144,24 +152,33 @@ class Model(nn.Module):
 
 
 class RGCN(nn.Module):
-    def __init__(self, in_feats, hid_feats1, hid_feats2, out_feats, rel_names):
+    def __init__(self, in_feats, hid_feats, out_feats, rel_names, num_layers=300):
         super().__init__()
-        self.conv1 = dglnn.HeteroGraphConv({
-            rel: dglnn.GraphConv(in_feats, hid_feats1)
-            for rel in rel_names}, aggregate='sum')
-        self.conv2 = dglnn.HeteroGraphConv({
-            rel: dglnn.GraphConv(hid_feats1, hid_feats2)
-            for rel in rel_names}, aggregate='sum')
-        self.conv3 = dglnn.HeteroGraphConv({
-            rel: dglnn.GraphConv(hid_feats2, out_feats)
-            for rel in rel_names}, aggregate='sum')
+        # self.conv1 = dglnn.HeteroGraphConv({
+        #     rel: dglnn.GraphConv(in_feats, hid_feats)
+        #     for rel in rel_names}, aggregate='sum')
+        # self.conv2 = dglnn.HeteroGraphConv({
+        #     rel: dglnn.GraphConv(hid_feats, out_feats)
+        #     for rel in rel_names}, aggregate='sum')
+
+        # Initialize first layer
+        self.conv_layers = nn.ModuleDict({
+            f'conv_{i}': dglnn.HeteroGraphConv({
+                rel: dglnn.GraphConv(hid_feats if i > 0 else in_feats,
+                                     out_feats if i == num_layers - 1 else hid_feats)
+                for rel in rel_names}, aggregate='sum')
+            for i in range(num_layers)
+        })
 
     def forward(self, graph, inputs):
-        # inputs are features of nodes
-        h = self.conv1(graph, inputs)
-        h = {k: F.relu(v) for k, v in h.items()}
-        h = self.conv2(graph, h)
-        h = self.conv3(graph, h)
+        # # inputs are features of nodes
+        # h = self.conv1(graph, inputs)
+        # h = {k: F.relu(v) for k, v in h.items()}
+        # h = self.conv2(graph, h)
+        # return h
+        h = inputs
+        for i in range(len(self.conv_layers)):
+            h = self.conv_layers[f'conv_{i}'](graph, h)
         return h
 
 
@@ -247,7 +264,8 @@ if __name__ == '__main__':
     validation = arr[size1:size1 + size2].tolist()
     test = arr[size1 + size2:].tolist()
 
-    model = Model(8, 10, 7, 5, ['conflict', 'linked', 'unlinked'])
+    model = Model(8, 300, 5, ['conflict', 'linked', 'unlinked'])
+
     #model = model.to('cuda')
     opt = torch.optim.Adam(model.parameters())
     loss_list = []
@@ -262,7 +280,7 @@ if __name__ == '__main__':
     #loss_func = FocalLoss(weights=class_weights, gamma=0) #when gamma=0 we have cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 1000
+    epochs = 100
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
@@ -274,7 +292,7 @@ if __name__ == '__main__':
         y_pred = []
         y_true = []
 
-        batch_size = 1024
+        batch_size = 128
         batched_training = split_into_batches(train, batch_size)
         for train_graphs in batched_training:
             loss_list_batch = []
@@ -415,7 +433,7 @@ if __name__ == '__main__':
             logits = model(test_graph, node_features, dec_graph)
         pred = logits.argmax(dim=-1)
         y_pred.append(pred)
-        assingnament_pred = to_assignment_matrix(test_graph, dec_graph, pred, 5)
+        assingnament_pred   = to_assignment_matrix(test_graph, dec_graph, pred, 5)
         assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 5)
         matches, diffs = count_matches_and_diffs([element for row in assingnament_pred for element in row],
                                                  [element for row in assingnament_actual for element in row])
