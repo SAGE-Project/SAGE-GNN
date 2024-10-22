@@ -1,4 +1,6 @@
 # Byte-compiled / optimized / DLL files
+Models/GNNs/SecureWebContainer/300-hidden-layers/model_RGCN_1000_samples_100_epochs_128_batchsize.pth
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
