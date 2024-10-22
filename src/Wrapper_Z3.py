@@ -23,32 +23,50 @@ def add_pred_soft_constraints(solver, prediction):
                           if x == 1]
             print("placements ", placements)
             a_matrix_index = comp_idx * solver.nrVM + vm_idx
-            if len(placements) != 0:
-                constraints.append(solver.a[a_matrix_index] == 1)
-            else:
-                constraints.append(solver.a[a_matrix_index] == 0)
-            for placement in placements:
-                vmType = placement #+ 1
+            # I'm already in the gnn model
 
-                #constraints.append(solver.vmType[vm_idx] == vmType)
-                #       solver.MemProv[vm_idx] == solver.offers_list[vmType][2],
-                #       solver.StorageProv[vm_idx] == solver.offers_list[vmType][3],
-                #       solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
+            if solver.sb_option != "None" and prediction =="gnn-pseudob":
+                print("pseudo-boolean constraints")
+                if len(placements) != 0:
+                    constraints.append(solver.a[a_matrix_index] == 1)
+                else:
+                    constraints.append(solver.a[a_matrix_index] == 0)
+                for placement in placements:
+                    vmType = placement #+ 1
 
-                constraints.append(solver.ProcProv[vm_idx] == solver.offers_list[vmType][1])
-                constraints.append(solver.MemProv[vm_idx] == solver.offers_list[vmType][2])
-                constraints.append(solver.StorageProv[vm_idx] == solver.offers_list[vmType][3])
-                constraints.append(solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
+                    #constraints.append(solver.vmType[vm_idx] == vmType)
+                    #       solver.MemProv[vm_idx] == solver.offers_list[vmType][2],
+                    #       solver.StorageProv[vm_idx] == solver.offers_list[vmType][3],
+                    #       solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
 
+                    constraints.append(solver.ProcProv[vm_idx] == solver.offers_list[vmType][1])
+                    constraints.append(solver.MemProv[vm_idx] == solver.offers_list[vmType][2])
+                    constraints.append(solver.StorageProv[vm_idx] == solver.offers_list[vmType][3])
+                    constraints.append(solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
+            elif prediction == "gnn+initv": #solver.sb_option might be "None" or not
+                print("set-initial-value")
+                if len(placements) != 0:
+                    solver.solver.set_initial_value(solver.a[a_matrix_index], 1)
+                else:
+                    solver.solver.set_initial_value(solver.a[a_matrix_index], 0)
+                for placement in placements:
+                    vmType = placement  # + 1
+
+                    # constraints.append(solver.vmType[vm_idx] == vmType)
+                    #       solver.MemProv[vm_idx] == solver.offers_list[vmType][2],
+                    #       solver.StorageProv[vm_idx] == solver.offers_list[vmType][3],
+                    #       solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
+
+                    solver.solver.set_initial_value(solver.ProcProv[vm_idx], solver.offers_list[vmType][1])
+                    solver.solver.set_initial_value(solver.MemProv[vm_idx], solver.offers_list[vmType][2])
+                    solver.solver.set_initial_value(solver.StorageProv[vm_idx], solver.offers_list[vmType][3])
+                    solver.solver.set_initial_value(solver.PriceProv[vm_idx], solver.offers_list[vmType][4])
+
+    # This is for solver.sb_option != "None" and prediction =="gnn-pseudob":
     constraints = list(set(constraints))
-    # I'm already in the gnn model
-    if solver.sb_option != "None":
-        print("at most")
-        constraints.append(len(constraints))
-        solver.solver.add(AtMost(constraints))
-    else:
-        print("add soft")
-        solver.solver.add_soft(constraints)
+    print("constraints ", constraints)
+    constraints.append(len(constraints))
+    solver.solver.add(AtMost(constraints))
 
 
 # def add_pred_soft_constraints_sim(solver, prediction):
@@ -90,6 +108,7 @@ class Wrapper_Z3:
         problem.readConfigurationJSON(
             application_model_json, availableConfigurations, inst
         )
+        print("out=", out)
         if out:
             SMTsolver.init_problem(problem, "optimize", sb_option=self.symmetry_breaker,
                                    smt2lib=f"../Output/SMT-LIB-assert-soft/" + application_model_json["application"] + "_" + str(uuid.uuid4()))

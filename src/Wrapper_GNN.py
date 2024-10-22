@@ -3,11 +3,11 @@ import dgl
 import torch
 from Wrapper_Z3 import Wrapper_Z3
 from dgl_graph import DGLGraph
-from gnn import get_graph_data, to_assignment_matrix, count_matches_and_diffs
+from trainRGCN import get_graph_data, to_assignment_matrix, count_matches_and_diffs
 
 
 class Wrapper_GNN:
-    def __init__(self, model_path="../Models/GNNs/SecureWebContainer/model_RGCN_100_samples_100_epochs.pth"):
+    def __init__(self, model_path="/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Models/GNNs/SecureWebContainer/1-hidden-layer/CrossEntropyLoss-aggreg-sum/model_RGCN_1000_samples_100_epochs_32_batchsize.pth"):
         print("in Wrapper_GNN")
         # load pre-existing trained model
         self.model = torch.load(model_path)
@@ -16,7 +16,7 @@ class Wrapper_GNN:
 
     def solve(self, application_model_json, offers_json):
         # Obtain data in required form (ignore solution)
-        app_json = Wrapper_Z3().solve(application_model_json, offers_json, out=False)
+        app_json = Wrapper_Z3().solve(application_model_json, offers_json, out=True)
         # Transform into graph data structure
         graph = get_graph_data(app_json, app_json["application"])
         # Transform into required DGL graph structure

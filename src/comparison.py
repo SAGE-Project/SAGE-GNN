@@ -1,6 +1,6 @@
 import json
 import random
-from gnn import Model, RGCN, HeteroMLPPredictor
+from trainRGCN import Model, RGCN, HeteroMLPPredictor
 from Wrapper_GNN import Wrapper_GNN
 from Wrapper_GNN_Z3 import Wrapper_GNN_Z3
 from Wrapper_Z3 import Wrapper_Z3
@@ -8,11 +8,11 @@ from Wrapper_Z3 import Wrapper_Z3
 with open("../Models/json/SecureWebContainer.json", "r") as file:
     application = json.load(file)
 
-with open("../Data/json/DigitalOcean.json", "r") as file:
+with open("../Data/json/offers_20.json", "r") as file:
     offers_do = json.load(file)
 
 #1.
-# wrapper_z3 = Wrapper_Z3(symmetry_breaker="None")
+#wrapper_z3 = Wrapper_Z3(symmetry_breaker="None")
 # print(wrapper_z3.solve(application, offers_do))
 #
 # #2.
@@ -20,12 +20,22 @@ with open("../Data/json/DigitalOcean.json", "r") as file:
 # print(wrapper_z3.solve(application, offers_do))
 
 # # 3.
-# wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="None")
-# print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn"))
+# predictions used as initial values
+wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="None")
+print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn+initv"))
 
-# 4.
-wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="FVPR")
-print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn"))
+# 3'.
+# predictions used as pseudo-boolean constraints
+# wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="None")
+# print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn-pseudob"))
+
+# 4
+# wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="FVPR")
+# print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn-initv"))
+
+# 4'
+# inwrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="FVPR")
+# prt(wrapper_gnn_z3.solve(application, offers_do, mode="gnn-pseudob"))
 
 # obsolete
 # wrapper_gnn_z3 = Wrapper_Z3_Unsat(symmetry_breaker="FVPR")
