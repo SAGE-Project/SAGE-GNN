@@ -13,7 +13,6 @@ import dgl.nn as dglnn
 import matplotlib.pyplot as plt
 from focal_loss.focal_loss import FocalLoss
 
-
 def read_jsons(path_to_dir):
     all_json_data = []
     index = 0
@@ -230,7 +229,7 @@ if __name__ == '__main__':
 
     graphs = []
     index = 0
-    samples = 1000
+    samples = 10
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
@@ -280,7 +279,7 @@ if __name__ == '__main__':
     #loss_func = FocalLoss(weights=class_weights, gamma=0) #when gamma=0 we have cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 100
+    epochs = 10
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
