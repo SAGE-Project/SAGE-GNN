@@ -115,20 +115,12 @@ def get_graph_data(json_data, file_name):
 class HeteroMLPPredictor(nn.Module):
     def __init__(self, in_dims, n_classes):
         super().__init__()
-        self.fc1 = nn.Linear(in_dims * 2, 300)  # First layer
-        self.fc2 = nn.Linear(300, 300)  # Second layer
-        self.fc3 = nn.Linear(300, n_classes)  # Third layer (output)
+        self.W = nn.Linear(in_dims * 2, n_classes)
 
     def apply_edges(self, edges):
-        x = torch.cat([edges.src['h'], edges.dst['h']], 1)  # Concatenate source and destination node features
-        x = self.fc1(x)  # Apply first layer with .... no ReLU
-        x = self.fc2(x)  # Apply second layer with .... no ReLU
-        y = self.fc3(x)  # Apply third (output) layer
+        x = torch.cat([edges.src['h'], edges.dst['h']], 1)
+        y = self.W(x)
         return {'score': y}
-
-        # x = torch.cat([edges.src['h'], edges.dst['h']], 1)
-        # y = self.W(x)
-        # return {'score': y}
 
     def forward(self, graph, h):
         # h contains the node representations for each edge type computed from
@@ -151,35 +143,21 @@ class Model(nn.Module):
 
 
 class RGCN(nn.Module):
-    def __init__(self, in_feats, hid_feats, out_feats, rel_names, num_layers=300):
+    def __init__(self, in_feats, hid_feats, out_feats, rel_names):
         super().__init__()
-        # self.conv1 = dglnn.HeteroGraphConv({
-        #     rel: dglnn.GraphConv(in_feats, hid_feats)
-        #     for rel in rel_names}, aggregate='sum')
-        # self.conv2 = dglnn.HeteroGraphConv({
-        #     rel: dglnn.GraphConv(hid_feats, out_feats)
-        #     for rel in rel_names}, aggregate='sum')
-
-        # Initialize first layer
-        self.conv_layers = nn.ModuleDict({
-            f'conv_{i}': dglnn.HeteroGraphConv({
-                rel: dglnn.GraphConv(hid_feats if i > 0 else in_feats,
-                                     out_feats if i == num_layers - 1 else hid_feats)
-                for rel in rel_names}, aggregate='sum')
-            for i in range(num_layers)
-        })
+        self.conv1 = dglnn.HeteroGraphConv({
+            rel: dglnn.GraphConv(in_feats, hid_feats)
+            for rel in rel_names}, aggregate='sum')
+        self.conv2 = dglnn.HeteroGraphConv({
+            rel: dglnn.GraphConv(hid_feats, out_feats)
+            for rel in rel_names}, aggregate='sum')
 
     def forward(self, graph, inputs):
-        # # inputs are features of nodes
-        # h = self.conv1(graph, inputs)
-        # h = {k: F.relu(v) for k, v in h.items()}
-        # h = self.conv2(graph, h)
-        # return h
-        h = inputs
-        for i in range(len(self.conv_layers)):
-            h = self.conv_layers[f'conv_{i}'](graph, h)
+        # inputs are features of nodes
+        h = self.conv1(graph, inputs)
+        h = {k: F.relu(v) for k, v in h.items()}
+        h = self.conv2(graph, h)
         return h
-
 
 def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
     vms_nr = int(len(tensor) / components_nr)
