@@ -34,8 +34,8 @@ class CPlex_Solver_Parent(ManuverSolver):
         #self.model.parameters.preprocessing.symmetry = 3
         # ### Option: 4 Exert a highly aggressive level of symmetry breaking
         #self.model.parameters.preprocessing.symmetry = 4
-        # ### Option: 5 Exert an extremely aggressive level of symmetry breaking
-        #self.model.parameters.preprocessing.symmetry = 5
+        # ### Option: SecureWebContainer_off27_sam1000_ep1000_batch128_hidden1_Z3_pseudobool Exert an extremely aggressive level of symmetry breaking
+        #self.model.parameters.preprocessing.symmetry = SecureWebContainer_off27_sam1000_ep1000_batch128_hidden1_Z3_pseudobool
 
         #0-default CPX_ALG_AUTOMATIC
         #2-CPX_ALG_DUAL

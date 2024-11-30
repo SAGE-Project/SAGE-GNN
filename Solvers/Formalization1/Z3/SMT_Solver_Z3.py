@@ -1,6 +1,8 @@
 from z3 import *
 from Solvers.Core.ManuverSolver import ManuverSolver
 import time
+import uuid
+
 
 class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
 
@@ -10,6 +12,7 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         :return: None
         """
         if self.solverTypeOptimize:
+            set_option(verbose=10)
             self.solver = Optimize()
         else:
             self.solver = Solver()
@@ -402,6 +405,8 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         if fileName is None: return
         with open(fileName, 'w+') as fo:
             fo.write(self.solver.sexpr())
+            fo.write('(get-objectives)\n')
+            fo.write('(exit)')
         fo.close()
 
     def createSMT2LIBFileSolution(self, fileName, status, model):
@@ -434,14 +439,24 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
 
         if self.solverTypeOptimize:
             opt = sum(self.PriceProv)
+            # self.solver.set(priority='lex')
+            #self.solver.set(priority='pareto')
+            #self.solver.set(priority='box') #comportament ciudat
             min = self.solver.minimize(opt)
         self.createSMT2LIBFile(self.smt2lib)
 
         self.get_current_time()
 
         startime = time.time()
+
         status = self.solver.check()
         stoptime = time.time()
+
+        res_stat = self.solver.statistics()
+        print(res_stat)
+        with open(f"../Output/Stats-Z3/" + str(uuid.uuid4()), 'w+') as fstat:
+            fstat.write(f"{res_stat}")
+        fstat.close()
 
         if not self.solverTypeOptimize:
             c = self.solver.unsat_core()
@@ -471,11 +486,12 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
             for k in range(self.nrVM):
                 vms_type.append(model[self.vmType[k]])
             #print(vms_type)
+            # print("objectives ", self.solver.objectives())
         else:
             print("UNSAT")
         if self.solverTypeOptimize:
             if status == sat:
-                print("a_mat", a_mat)
+                #print("a_mat", a_mat)
                 # create corresponding SMT-LIB file
                 self.createSMT2LIBFileSolution(self.smt2libsol, status, model)
                 # do not return min.value() since the type is not comparable with -1 in the exposeRE

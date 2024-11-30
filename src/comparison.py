@@ -27,15 +27,15 @@ print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn+initv"))
 # 3'.
 # predictions used as pseudo-boolean constraints
 # wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="None")
-# print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn-pseudob"))
+# print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn+pseudob"))
 
 # 4
 # wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="FVPR")
-# print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn-initv"))
+# print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn+initv"))
 
 # 4'
 # inwrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="FVPR")
-# prt(wrapper_gnn_z3.solve(application, offers_do, mode="gnn-pseudob"))
+# prt(wrapper_gnn_z3.solve(application, offers_do, mode="gnn+pseudob"))
 
 # obsolete
 # wrapper_gnn_z3 = Wrapper_Z3_Unsat(symmetry_breaker="FVPR")

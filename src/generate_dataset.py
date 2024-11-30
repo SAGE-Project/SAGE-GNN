@@ -4,23 +4,29 @@ import random
 
 from Wrapper_Z3 import Wrapper_Z3
 
-with open("../Models/json/SecureWebContainer.json", "r") as file:
+with open("../Models/json/Oryx2.json", "r") as file:
     application = json.load(file)
 
-with open("../Data/json/offers_40.json", "r") as file:
+with open("../Data/json/offers_20.json", "r") as file:
     offers_do = json.load(file)
 
 # get all keys from the original object
 keys = list(offers_do.keys())
 
-# For SecureWebContainer
+# For SecureWebContainer, Oryx2
 # generate all possible combinations of r=36 keys out of 40 approx which leads to approx 90 k
 # itertools.combinations generates the combinations in lex order of they key which in our case is the Id of the offer.
 # Hence, there might be offers with very similar hardware chosen, especially the first ones generated.
-combos = list(itertools.combinations(keys, 36))
+# For Oryx2, we stopped at 6925 samples which took more than 2 days to generate.
+# For Wordpress3
+# generate all possible combinations of r=37 keys out of 40 approx which leads to approx 9880
+# for 40 choose 30/10 takes a lot of time to generate milions of numbers
+# used 20 choose 7
+combos = list(itertools.combinations(keys, 7))
 
-# So, we shuffle the keys in order to obtain a good variety of offers in an offer
+# So, we shuffle the keys in order to obtain a good variety of offers in a generated offer
 random.shuffle(combos)
+
 
 offers_comb = []
 # loop through each combination and create a new object
@@ -34,12 +40,12 @@ index = 0
 for offer in offers_comb:
     print("offer ", offer)
     wrapper = Wrapper_Z3()
-    with open("../Models/json/SecureWebContainer.json", "r") as file:
+    with open("../Models/json/Oryx2.json", "r") as file:
         application = json.load(file)
     result = wrapper.solve(application, offer)
     if result:
         index = index + 1
         print("idx", index)
-        with open(f"../Datasets/DsSecureWebContainer/{application['application']}_{index}.json", "w") as outfile:
+        with open(f"../Datasets/DsOryx2_20_7/{application['application']}_{index}.json", "w") as outfile:
             # Write the JSON data to the file
             json.dump(result, outfile, indent=4)

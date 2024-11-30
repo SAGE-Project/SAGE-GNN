@@ -85,8 +85,8 @@ def count_min_price_and_files(directory):
 
 def main():
     # Define input and output directories
-    directory_path = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Datasets/DsSecureWebContainer_40_36"
-    output_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/Stats-Gini/out-DsSecureWebContainer_40_36.txt"  # Change this to your desired output path
+    directory_path = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Datasets/DsWordpress_20_7"
+    output_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/Stats-Gini/???"  # Change this to your desired output path
 
     # Validate input directory
     if not os.path.isdir(directory_path):
@@ -99,7 +99,7 @@ def main():
     # Write results as arrays of tuples
     with open(output_file, "w") as file:
         file.write("# Results in the form of arrays of tuples\n\n")
-        file.write("occurrences (min_val, number of occurences) = ")
+        file.write("occurrences (number of occurences, min_val) = ")
         file.write(repr(sorted(occurrences, reverse=True)) + "\n\n")
 
         file.write("diversity of labels: len(occurrences)= ")

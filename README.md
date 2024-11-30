@@ -27,7 +27,7 @@ By using these GNN-based predictions as soft constraints in Z3, we enhance searc
 2. **GNN Model Implementation:**
    - Construct and train the GNN model able to predict component-to-VM assignments and VM Offer types.
    - Save trained model for future use.
-   - Explore the implementation: 🔗 [src/gnn.py](./src/gnn.py)
+   - Explore the implementation: 🔗 [src/gnn.py](./src/trainRGCN.py)
    - 🔗 Saved Model: [Models/GNNs/SecureWebContainer/model_RGCN_50_samples_100_epochs.pth](./Models/GNNs/SecureWebContainer/model_RGCN_50_samples_100_epochs.pth)
 
 3. **Integration with SMT Solver Z3:**

@@ -7,7 +7,7 @@ from trainRGCN import get_graph_data, to_assignment_matrix, count_matches_and_di
 
 
 class Wrapper_GNN:
-    def __init__(self, model_path="/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Models/GNNs/SecureWebContainer/1-hidden-layer/CrossEntropyLoss-aggreg-sum/model_RGCN_1000_samples_100_epochs_32_batchsize.pth"):
+    def __init__(self, model_path="/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Models/GNNs/ModelsBetterDiversityDatasets/SecureWebContainer/model_RGCN_1000_samples_100_epochs_32_batchsize.pth"):
         print("in Wrapper_GNN")
         # load pre-existing trained model
         self.model = torch.load(model_path)

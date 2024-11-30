@@ -105,7 +105,11 @@ def get_graph_data(json_data, file_name):
             if storage > max_storage: max_storage = storage
             if price > max_price: max_price = price
 
-    surrogate_result = 6 # Secure Web Container
+        #surrogate_result = 6 # Secure Web Container
+        surrogate_result = 5  # Secure Billing Email
+        #surrogate_result = 11  #Oryx2
+        #surrogate_result = 8  # Wordpress3
+        # surrogate_result = 10  # Wordpress4
     component_nodes = get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage)
     vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
                             surrogate_result)
@@ -202,12 +206,12 @@ def split_into_batches(arr, batch_size):
 
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
-    data = read_jsons('../Datasets/DsSecureWebContainer')
+    data = read_jsons('../Datasets/DsSecureBillingEmail_20_7/')
     #print("AFTER DIR READ")
 
     graphs = []
     index = 0
-    samples = 10
+    samples = 11835
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
@@ -257,7 +261,7 @@ if __name__ == '__main__':
     #loss_func = FocalLoss(weights=class_weights, gamma=0) #when gamma=0 we have cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 10
+    epochs = 100
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
@@ -269,7 +273,7 @@ if __name__ == '__main__':
         y_pred = []
         y_true = []
 
-        batch_size = 128
+        batch_size = 32
         batched_training = split_into_batches(train, batch_size)
         for train_graphs in batched_training:
             loss_list_batch = []
@@ -371,7 +375,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/SecureWebContainer/loss_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/ModelsBetterDiversityDatasets/SecureWebContainer/loss_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -381,7 +385,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/SecureWebContainer/acc_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/ModelsBetterDiversityDatasets/SecureWebContainer/acc_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -410,8 +414,13 @@ if __name__ == '__main__':
             logits = model(test_graph, node_features, dec_graph)
         pred = logits.argmax(dim=-1)
         y_pred.append(pred)
+        # last argument is the # of components of the application, Secure Web Container=5
+        # last argument is the # of components of the application, Oryx2=10
+        # last argument is the # of components of the application, Wordpress3=5
         assingnament_pred   = to_assignment_matrix(test_graph, dec_graph, pred, 5)
+        #print("assingnament_pred", assingnament_pred)
         assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 5)
+        #print("assingnament_actual", assingnament_actual)
         matches, diffs = count_matches_and_diffs([element for row in assingnament_pred for element in row],
                                                  [element for row in assingnament_actual for element in row])
         matchesCount += matches
@@ -435,4 +444,4 @@ if __name__ == '__main__':
 
     path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth'
-    torch.save(model, f'../Models/GNNs/SecureWebContainer/model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth')
+    torch.save(model, f'../Models/GNNs/ModelsBetterDiversityDatasets/SecureBillingEmail/model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth')
