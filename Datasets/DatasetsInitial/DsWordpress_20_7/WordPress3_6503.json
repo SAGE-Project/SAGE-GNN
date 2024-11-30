@@ -1,0 +1,336 @@
+{
+    "application": "WordPress3",
+    "comment-general": "From the Zephyrus-ASE paper: at least 3 replicas of Wordpress or at least 7 DNS (we can not capture OR in the UI, we have here the 3 Wordpress replicas); Answer: minimum 4VMs",
+    "components": [
+        {
+            "id": 1,
+            "name": "WordPress",
+            "Compute": {
+                "CPU": 2,
+                "GPU": "false",
+                "Memory": 512
+            },
+            "Storage": {
+                "StorageType": "HDD",
+                "StorageSize": 1000
+            },
+            "Network": {},
+            "keywords": [],
+            "operatingSystem": "Linux",
+            "preferences": {}
+        },
+        {
+            "id": 2,
+            "name": "MySQL",
+            "Compute": {
+                "CPU": 2,
+                "GPU": "false",
+                "Memory": 512
+            },
+            "Storage": {
+                "StorageType": "HDD",
+                "StorageSize": 2000
+            },
+            "Network": {},
+            "keywords": [],
+            "operatingSystem": "Linux",
+            "preferences": {}
+        },
+        {
+            "id": 3,
+            "name": "DNSLoadBalancer",
+            "comments": "As load balancers, either DNS or HTTP",
+            "Compute": {
+                "CPU": 4,
+                "GPU": "false",
+                "Memory": 2048
+            },
+            "Storage": {
+                "StorageType": "HDD",
+                "StorageSize": 500
+            },
+            "Network": {},
+            "keywords": [],
+            "operatingSystem": "Linux",
+            "preferences": {}
+        },
+        {
+            "id": 4,
+            "name": "HTTPLoadBalancer",
+            "Compute": {
+                "CPU": 4,
+                "GPU": "false",
+                "Memory": 2048
+            },
+            "Storage": {
+                "StorageType": "HDD",
+                "StorageSize": 500
+            },
+            "Network": {},
+            "keywords": [],
+            "operatingSystem": "Linux",
+            "preferences": {}
+        },
+        {
+            "id": 5,
+            "name": "Varnish",
+            "Compute": {
+                "CPU": 4,
+                "GPU": "false",
+                "Memory": 4000
+            },
+            "Storage": {
+                "StorageType": "HDD",
+                "StorageSize": 500
+            },
+            "Network": {},
+            "keywords": [],
+            "operatingSystem": "Linux",
+            "preferences": {}
+        }
+    ],
+    "IP": {
+        "publicIPs": 1,
+        "IPType": "IP4"
+    },
+    "comment-restrictions": "RequireProvideDependency to be read as: for 1 instance of component with id 2 there must be at least ",
+    "restrictions": [
+        {
+            "type": "LowerBound",
+            "compsIdList": [
+                1
+            ],
+            "bound": 3
+        },
+        {
+            "type": "LowerBound",
+            "compsIdList": [
+                2
+            ],
+            "bound": 2
+        },
+        {
+            "type": "LowerBound",
+            "compsIdList": [
+                5
+            ],
+            "bound": 2
+        },
+        {
+            "type": "RequireProvideDependency",
+            "alphaCompId": 1,
+            "betaCompId": 3,
+            "alphaCompIdInstances": 1,
+            "betaCompIdInstances": 7
+        },
+        {
+            "type": "UpperBound",
+            "compsIdList": [
+                3
+            ],
+            "bound": 1
+        },
+        {
+            "type": "RequireProvideDependency",
+            "alphaCompId": 1,
+            "betaCompId": 4,
+            "alphaCompIdInstances": 1,
+            "betaCompIdInstances": 3
+        },
+        {
+            "type": "RequireProvideDependency",
+            "alphaCompId": 1,
+            "betaCompId": 2,
+            "alphaCompIdInstances": 2,
+            "betaCompIdInstances": 3
+        },
+        {
+            "type": "AlternativeComponents",
+            "alphaCompId": 3,
+            "betaCompId": 4
+        },
+        {
+            "type": "Conflicts",
+            "alphaCompId": 3,
+            "compsIdList": [
+                1,
+                2,
+                5
+            ]
+        },
+        {
+            "type": "Conflicts",
+            "alphaCompId": 4,
+            "compsIdList": [
+                1,
+                2,
+                5
+            ]
+        },
+        {
+            "type": "Conflicts",
+            "alphaCompId": 5,
+            "compsIdList": [
+                2,
+                3,
+                4
+            ]
+        }
+    ],
+    "output": {
+        "min_price": 4248,
+        "type_of_sym_br": "None",
+        "time (secs)": 0.6737639904022217,
+        "types_of_VMs": [
+            5,
+            5,
+            5,
+            7,
+            0,
+            7,
+            0,
+            7
+        ],
+        "prices_of_VMs": [
+            1288,
+            1288,
+            1288,
+            128,
+            0,
+            128,
+            0,
+            128
+        ],
+        "VMs specs": [
+            {
+                "c8.0m68.4s2.0osLinuxp1.2880000000": {
+                    "cpu": 8,
+                    "memory": 68400,
+                    "storage": 2000,
+                    "operatingSystem": "Linux",
+                    "price": 1288,
+                    "id": 5
+                }
+            },
+            {
+                "c2.0m3.75s2.0osLinuxp0.1280000000": {
+                    "cpu": 2,
+                    "memory": 3750,
+                    "storage": 2000,
+                    "operatingSystem": "Linux",
+                    "price": 128,
+                    "id": 7
+                }
+            }
+        ],
+        "assign_matr": [
+            [
+                0,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        ],
+        "offers": {
+            "c64.0m1.952s1.0osLinuxp16.0000000000": {
+                "cpu": 64,
+                "memory": 1952,
+                "storage": 1000,
+                "operatingSystem": "Linux",
+                "price": 16000
+            },
+            "c32.0m244.0s4.0osLinuxp4.5760000000": {
+                "cpu": 32,
+                "memory": 244000,
+                "storage": 4000,
+                "operatingSystem": "Linux",
+                "price": 4576,
+                "id": 3
+            },
+            "c17.0m117.0s24.0osLinuxp5.4000000000": {
+                "cpu": 17,
+                "memory": 117000,
+                "storage": 24000,
+                "operatingSystem": "Linux",
+                "price": 5400,
+                "id": 3
+            },
+            "c16.0m122.0s1.0osLinuxp3.0790000000": {
+                "cpu": 16,
+                "memory": 122000,
+                "storage": 1000,
+                "operatingSystem": "Linux",
+                "price": 3079,
+                "id": 5
+            },
+            "c8.0m68.4s2.0osLinuxp1.2880000000": {
+                "cpu": 8,
+                "memory": 68400,
+                "storage": 2000,
+                "operatingSystem": "Linux",
+                "price": 1288,
+                "id": 5
+            },
+            "c2.0m7.5s1.0osLinuxp0.1460000000": {
+                "cpu": 2,
+                "memory": 7500,
+                "storage": 1000,
+                "operatingSystem": "Linux",
+                "price": 146,
+                "id": 6
+            },
+            "c2.0m3.75s2.0osLinuxp0.1280000000": {
+                "cpu": 2,
+                "memory": 3750,
+                "storage": 2000,
+                "operatingSystem": "Linux",
+                "price": 128,
+                "id": 7
+            }
+        }
+    }
+}
