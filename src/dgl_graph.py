@@ -8,16 +8,22 @@ class DGLGraph(DGLDataset):
         self.graph_init = graph_init
         super().__init__(name='dgl_graph')
 
+        #print("??? ", self.graph_init)
+
     def process(self):
         components_src = []
         components_dest = []
-        #print("self.graph_init.edges ", self.graph_init.edges)
+        # print("self.graph_init.nodes", len(self.graph_init.nodes))
+        # print("self.graph_init.edges", len(self.graph_init.edges))
+        # print("self.graph_init.links", self.graph_init.links)
         for edge in self.graph_init.edges:
             components_src.append(edge.node1.id - 1)
             components_dest.append(edge.node2.id - 1)
 
         size_components = len([n for n in self.graph_init.nodes if n.get_type() == "component"])
         size_vms = len([n for n in self.graph_init.nodes if n.get_type() == "vm"])
+        # print("size_components", size_components)
+        # print("size_vms", size_vms)
 
         link_src = []
         link_dest = []
@@ -41,7 +47,7 @@ class DGLGraph(DGLDataset):
             ('component', 'linked', 'vm'): (torch.tensor(link_src), torch.tensor(link_dest)), # component linkedCM
             ('component', 'unlinked', 'vm'): (torch.tensor(unlink_src), torch.tensor(unlink_dest))  # component unlinkedCM
         })
-        # print("self", self.graph)
+        #print("self", self.graph)
 
         features_components = [x.features for x in self.graph_init.nodes if x.get_type() == "component"]
         features_vms = [x.features for x in self.graph_init.nodes if x.get_type() == "vm"]

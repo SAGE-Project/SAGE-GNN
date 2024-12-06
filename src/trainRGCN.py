@@ -5,6 +5,8 @@ import torch
 import time
 
 import numpy as np
+from sympy.assumptions.handlers import test_closed_group
+
 from graph import Node, Graph
 from dgl_graph import DGLGraph, print_dataset
 import torch.nn as nn
@@ -38,8 +40,10 @@ def get_node_features(component, restrictions, max_cpu, max_mem, max_storage, id
     upper_b = 0
     lower_b = 0
     eq_b = 0
-
+    #print("====")
     node_id = component['id']
+    # print(node_id)
+    # print(restrictions)
     for res in restrictions:
         if res["type"] == "FullDeployment" and res["alphaCompId"] == node_id:
             full_deploy = 1
@@ -49,9 +53,9 @@ def get_node_features(component, restrictions, max_cpu, max_mem, max_storage, id
             lower_b = 1
         if res["type"] == "EqualBound" and len(res["compsIdList"]) == 1 and node_id in res["compsIdList"]:
             eq_b = 1
+    #print(full_deploy, upper_b, lower_b, eq_b)
 
     return [id/4, cpu, memory, storage, full_deploy, upper_b, lower_b, eq_b]
-
 
 def get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage):
     component_nodes = []
@@ -60,7 +64,6 @@ def get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage):
         component_node = Node(component['id'], features, "component")
         component_nodes.append(component_node)
     return component_nodes
-
 
 def get_vm_nodes(json_data, starting_index, max_cpu, max_mem, max_storage, max_price, surrogate_result):
     vm_nodes = []
@@ -77,7 +80,6 @@ def get_vm_nodes(json_data, starting_index, max_cpu, max_mem, max_storage, max_p
             vm_nodes.append(Node(starting_index + idx, vm_features + [(i + 1) / surrogate_result], "vm"))
             idx = idx + 1
     return vm_nodes
-
 
 def get_graph_data(json_data, file_name):
     restrictions = json_data["restrictions"]
@@ -106,15 +108,17 @@ def get_graph_data(json_data, file_name):
             if price > max_price: max_price = price
 
         #surrogate_result = 6 # Secure Web Container
-        surrogate_result = 5  # Secure Billing Email
+        #surrogate_result = 5  # Secure Billing Email
         #surrogate_result = 11  #Oryx2
-        #surrogate_result = 8  # Wordpress3
+        surrogate_result = 8  # Wordpress3
         # surrogate_result = 10  # Wordpress4
     component_nodes = get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage)
+    #print("component nodes ", component_nodes)
+
     vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
                             surrogate_result)
+    #print("vm_nodes ", len(vm_nodes), vm_nodes)
     return Graph(file_name, component_nodes, vm_nodes, restrictions, assign, json_data["output"], surrogate_result)
-
 
 class HeteroMLPPredictor(nn.Module):
     def __init__(self, in_dims, n_classes):
@@ -133,7 +137,6 @@ class HeteroMLPPredictor(nn.Module):
             graph.ndata['h'] = h
             graph.apply_edges(self.apply_edges)
             return graph.edata['score']
-
 
 class Model(nn.Module):
     def __init__(self, in_features, hidden_features, out_features, rel_names):
@@ -165,7 +168,9 @@ class RGCN(nn.Module):
 
 def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
     vms_nr = int(len(tensor) / components_nr)
+    #print("vms_nr ", vms_nr)
     assign_matrix = [[0 for _ in range(vms_nr)] for _ in range(components_nr)]
+    #print("assign_matrix ", assign_matrix, len(assign_matrix), len(assign_matrix[0]))
 
     for dec_ind in range(len(tensor)):
         type = dec_graph.edata[dgl.ETYPE][dec_ind].item()
@@ -173,6 +178,7 @@ def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
         type_edge = graph.etypes[type]
         component = graph.edges(form='uv', order='srcdst', etype=type_edge)[0][orig_index].item()
         vm = graph.edges(form='uv', order='srcdst', etype=type_edge)[1][orig_index].item()
+        #print("component ", component, " vm ", vm)
         value = tensor[dec_ind].item()
         if value == 2:
             assign_matrix[component][vm] = 0
@@ -206,17 +212,18 @@ def split_into_batches(arr, batch_size):
 
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
-    data = read_jsons('../Datasets/DsSecureBillingEmail_20_7/')
+    data = read_jsons('/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Datasets/DatasetsImprovedGini/DsWordpress_20_7_improved_Gini')
     #print("AFTER DIR READ")
 
     graphs = []
     index = 0
-    samples = 11835
+    samples = 1000
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
         filename = json_graph_data['filename']
         graphs.append(get_graph_data(json_graph_data, filename))
+        #print("graph data", get_graph_data(json_graph_data, filename))
 
     dgl_graphs = []
     index = 0
@@ -230,6 +237,7 @@ if __name__ == '__main__':
         # print(graph)
         dataset = DGLGraph(graph)
         dgl_graph = dataset[0]
+        #print("dgl graph ", dgl_graph)
         #dgl_graph = dgl_graph.to('cuda')
         # print_dataset(dgl_graph)
         dgl_graphs.append(dgl_graph)
@@ -261,7 +269,7 @@ if __name__ == '__main__':
     #loss_func = FocalLoss(weights=class_weights, gamma=0) #when gamma=0 we have cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
-    epochs = 100
+    epochs = 10
     for epoch in range(epochs):
         ###########################################################################################################################################################
         ######################################################################## TRAINING #########################################################################
@@ -293,7 +301,12 @@ if __name__ == '__main__':
 
                 node_features = {'component': comp_feats, 'vm': vm_feats}
 
+                # print("train graph ", train_graph)
+                # print("node features ", node_features)
+                # print("dec graph ", dec_graph)
+
                 logits = model(train_graph, node_features, dec_graph)
+                #print("logits", logits, len(logits), len(logits[0]))
                 #logits = logits.to('cuda')
                 if total_logits == None:
                     total_logits = logits
@@ -375,7 +388,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/ModelsBetterDiversityDatasets/SecureWebContainer/loss_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/Models_20_7_Datasets/Wordpress/loss_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -385,7 +398,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/ModelsBetterDiversityDatasets/SecureWebContainer/acc_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/Models_20_7_Datasets/Wordpress/acc_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -398,25 +411,38 @@ if __name__ == '__main__':
     # set the model to evaluation mode
     model.eval()
 
+    #print("test ", test)
+
     # loop over the test graphs and compute the predictions and true labels
     #print("len test ", len(test))
     matchesCount = 0
     diffsCount = 0
     for test_graph in test:
         dec_graph = test_graph['component', :, 'vm']
-        #print(dec_graph)
+        #print("dec graph", dec_graph)
 
         edge_label = dec_graph.edata[dgl.ETYPE]
         comp_feats = test_graph.nodes['component'].data['feat']
         vm_feats = test_graph.nodes['vm'].data['feat']
         node_features = {'component': comp_feats, 'vm': vm_feats}
+        #print("node features ", node_features)
         with torch.no_grad():
             logits = model(test_graph, node_features, dec_graph)
         pred = logits.argmax(dim=-1)
+
+        #print("logits ", len(logits))
+        #print("pred:", pred)
+
         y_pred.append(pred)
         # last argument is the # of components of the application, Secure Web Container=5
+        # last argument is the # of components of the application, Secure Billing Email=5
         # last argument is the # of components of the application, Oryx2=10
         # last argument is the # of components of the application, Wordpress3=5
+        # print("=====================================")
+        # print(test_graph)
+        # print(dec_graph)
+        # print(pred)
+        # print("=====================================")
         assingnament_pred   = to_assignment_matrix(test_graph, dec_graph, pred, 5)
         #print("assingnament_pred", assingnament_pred)
         assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 5)
@@ -444,4 +470,4 @@ if __name__ == '__main__':
 
     path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth'
-    torch.save(model, f'../Models/GNNs/ModelsBetterDiversityDatasets/SecureBillingEmail/model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth')
+    torch.save(model, f'../Models/GNNs/Models_20_7_Datasets-improved-Gini/Models_20_7_Wordpress-improved-Gini/model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth')
