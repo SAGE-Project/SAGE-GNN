@@ -1,0 +1,285 @@
+sat
+(
+  (define-fun ProcProv4 () Int
+    4)
+  (define-fun StorageProv2 () Int
+    2000)
+  (define-fun VM1Type () Int
+    21)
+  (define-fun C3_VM6 () Int
+    0)
+  (define-fun C1_VM3 () Int
+    0)
+  (define-fun C4_VM6 () Int
+    0)
+  (define-fun VM2Type () Int
+    26)
+  (define-fun C1_VM2 () Int
+    0)
+  (define-fun C5_VM1 () Int
+    1)
+  (define-fun ProcProv2 () Int
+    4)
+  (define-fun VM3Type () Int
+    22)
+  (define-fun MemProv3 () Int
+    68400)
+  (define-fun C2_VM1 () Int
+    0)
+  (define-fun C2_VM6 () Int
+    0)
+  (define-fun C4_VM5 () Int
+    0)
+  (define-fun PriceProv5 () Int
+    252)
+  (define-fun C3_VM5 () Int
+    0)
+  (define-fun ProcProv1 () Int
+    8)
+  (define-fun C3_VM3 () Int
+    0)
+  (define-fun MemProv6 () Int
+    7500)
+  (define-fun StorageProv5 () Int
+    2000)
+  (define-fun C2_VM2 () Int
+    1)
+  (define-fun C5_VM3 () Int
+    0)
+  (define-fun C1_VM6 () Int
+    1)
+  (define-fun StorageProv1 () Int
+    4000)
+  (define-fun C5_VM5 () Int
+    1)
+  (define-fun MemProv2 () Int
+    7500)
+  (define-fun MemProv1 () Int
+    7000)
+  (define-fun C3_VM2 () Int
+    0)
+  (define-fun C2_VM4 () Int
+    1)
+  (define-fun StorageProv4 () Int
+    2000)
+  (define-fun PriceProv2 () Int
+    252)
+  (define-fun PriceProv6 () Int
+    252)
+  (define-fun C2_VM3 () Int
+    0)
+  (define-fun PriceProv4 () Int
+    252)
+  (define-fun C3_VM4 () Int
+    0)
+  (define-fun ProcProv5 () Int
+    4)
+  (define-fun PriceProv3 () Int
+    1288)
+  (define-fun C2_VM5 () Int
+    1)
+  (define-fun ProcProv6 () Int
+    4)
+  (define-fun MemProv5 () Int
+    7500)
+  (define-fun C1_VM5 () Int
+    0)
+  (define-fun C3_VM1 () Int
+    1)
+  (define-fun C4_VM3 () Int
+    1)
+  (define-fun PriceProv1 () Int
+    632)
+  (define-fun VM6Type () Int
+    26)
+  (define-fun MemProv4 () Int
+    7500)
+  (define-fun VM4Type () Int
+    26)
+  (define-fun C4_VM1 () Int
+    0)
+  (define-fun C1_VM4 () Int
+    0)
+  (define-fun C5_VM2 () Int
+    1)
+  (define-fun ProcProv3 () Int
+    8)
+  (define-fun C5_VM4 () Int
+    1)
+  (define-fun VM5Type () Int
+    26)
+  (define-fun StorageProv3 () Int
+    2000)
+  (define-fun StorageProv6 () Int
+    2000)
+  (define-fun C4_VM4 () Int
+    0)
+  (define-fun C4_VM2 () Int
+    0)
+  (define-fun C5_VM6 () Int
+    0)
+  (define-fun C1_VM1 () Int
+    0)
+)
+(
+  (define-fun ProcProv4 () Int
+    4)
+  (define-fun StorageProv2 () Int
+    2000)
+  (define-fun VM1Type () Int
+    21)
+  (define-fun C3_VM6 () Int
+    0)
+  (define-fun C1_VM3 () Int
+    0)
+  (define-fun C4_VM6 () Int
+    0)
+  (define-fun VM2Type () Int
+    26)
+  (define-fun C1_VM2 () Int
+    0)
+  (define-fun C5_VM1 () Int
+    1)
+  (define-fun ProcProv2 () Int
+    4)
+  (define-fun VM3Type () Int
+    22)
+  (define-fun MemProv3 () Int
+    68400)
+  (define-fun C2_VM1 () Int
+    0)
+  (define-fun C2_VM6 () Int
+    0)
+  (define-fun C4_VM5 () Int
+    0)
+  (define-fun PriceProv5 () Int
+    252)
+  (define-fun C3_VM5 () Int
+    0)
+  (define-fun ProcProv1 () Int
+    8)
+  (define-fun C3_VM3 () Int
+    0)
+  (define-fun MemProv6 () Int
+    7500)
+  (define-fun StorageProv5 () Int
+    2000)
+  (define-fun C2_VM2 () Int
+    1)
+  (define-fun C5_VM3 () Int
+    0)
+  (define-fun C1_VM6 () Int
+    1)
+  (define-fun StorageProv1 () Int
+    4000)
+  (define-fun C5_VM5 () Int
+    1)
+  (define-fun MemProv2 () Int
+    7500)
+  (define-fun MemProv1 () Int
+    7000)
+  (define-fun C3_VM2 () Int
+    0)
+  (define-fun C2_VM4 () Int
+    1)
+  (define-fun StorageProv4 () Int
+    2000)
+  (define-fun PriceProv2 () Int
+    252)
+  (define-fun PriceProv6 () Int
+    252)
+  (define-fun C2_VM3 () Int
+    0)
+  (define-fun PriceProv4 () Int
+    252)
+  (define-fun C3_VM4 () Int
+    0)
+  (define-fun ProcProv5 () Int
+    4)
+  (define-fun PriceProv3 () Int
+    1288)
+  (define-fun C2_VM5 () Int
+    1)
+  (define-fun ProcProv6 () Int
+    4)
+  (define-fun MemProv5 () Int
+    7500)
+  (define-fun C1_VM5 () Int
+    0)
+  (define-fun C3_VM1 () Int
+    1)
+  (define-fun C4_VM3 () Int
+    1)
+  (define-fun PriceProv1 () Int
+    632)
+  (define-fun VM6Type () Int
+    26)
+  (define-fun MemProv4 () Int
+    7500)
+  (define-fun VM4Type () Int
+    26)
+  (define-fun C4_VM1 () Int
+    0)
+  (define-fun C1_VM4 () Int
+    0)
+  (define-fun C5_VM2 () Int
+    1)
+  (define-fun ProcProv3 () Int
+    8)
+  (define-fun C5_VM4 () Int
+    1)
+  (define-fun VM5Type () Int
+    26)
+  (define-fun StorageProv3 () Int
+    2000)
+  (define-fun StorageProv6 () Int
+    2000)
+  (define-fun C4_VM4 () Int
+    0)
+  (define-fun C4_VM2 () Int
+    0)
+  (define-fun C5_VM6 () Int
+    0)
+  (define-fun C1_VM1 () Int
+    0)
+)
+(objectives
+ ( 421)
+ ((+ 0 PriceProv1 PriceProv2 PriceProv3 PriceProv4 PriceProv5 PriceProv6) 2928)
+)
+(:added-eqs                   1046612
+ :arith-eq-adapter            488103
+ :arith-bound-propagations-lp 54101
+ :arith-conflicts             149
+ :arith-diseq                 1827453
+ :arith-fixed-eqs             15401
+ :arith-lower                 1717836
+ :arith-make-feasible         233165
+ :arith-max-columns           147
+ :arith-max-rows              20
+ :arith-upper                 2152214
+ :binary-propagations         11832344
+ :conflicts                   42337
+ :decisions                   423919
+ :del-clause                  1275655
+ :final-checks                1062
+ :max-memory                  57.52
+ :maxsat-cores                386
+ :memory                      57.14
+ :minimized-lits              541267
+ :mk-bool-var                 586086
+ :mk-clause                   1277611
+ :mk-clause-binary            5550
+ :num-allocs                  29666593556.00
+ :num-checks                  1645
+ :pb-conflicts                5179
+ :pb-predicates               474
+ :pb-propagations             77775
+ :pb-resolves                 5168
+ :propagations                21642050
+ :restarts                    217
+ :rlimit-count                82541242
+ :solve-eqs-elim-vars         1
+ :solve-eqs-steps             10
+ :time                        4.43
+ :total-time                  4.43)
