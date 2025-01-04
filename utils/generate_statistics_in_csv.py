@@ -7,10 +7,10 @@ import re
 def extract_parameters(filename):
     # Pattern for SecureWeb_RGCN files
     rgcn_pattern = (
-        r"SecureWeb_RGCN_(?P<samples>\d+)_samples_(?P<epochs>\d+)_epochs_(?P<batchsize>\d+)_batchsize_off_(?P<offers>\d+)_(?P<type>lex|nones)"
+        r"SecureBillingEmail_RGCN_(?P<samples>\d+)_samples_(?P<epochs>\d+)_epochs_(?P<batchsize>\d+)_batchsize_off_(?P<offers>\d+)_(?P<type>lex|nones)"
     )
     # Pattern for SecureWebContainer files
-    container_pattern = r"SecureWebContainer_off_(?P<offers>\d+)\.out"
+    container_pattern = r"SecureBillingEmail_off_(?P<offers>\d+)\.out"
 
     rgcn_match = re.match(rgcn_pattern, filename)
     if rgcn_match:
@@ -111,7 +111,7 @@ def write_data_to_csv(data, output_file):
 # Main function
 def main():
     # Hardcoded input directory and output file
-    input_directory = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/SecureWebContainer/"  # Replace with your directory path
+    input_directory = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/SecureBillingEmail"  # Replace with your directory path
     output_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/utils/output.csv"  # Replace with your desired output file path
 
     # Process directory and extract data
