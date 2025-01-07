@@ -1,0 +1,10 @@
+(error "line 1 column 1: invalid command, '(' expected")
+(error "line 3 column 2: invalid command, symbol expected")
+unsupported
+; objectives line: 107 position: 0
+(error "line 108 column 1: invalid command, symbol expected")
+(:max-memory   0.19
+ :memory       0.19
+ :num-allocs   438
+ :rlimit-count 1
+ :total-time   0.00)

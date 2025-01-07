@@ -1,0 +1,143 @@
+sat
+(
+  (define-fun PriceProv1 () Int
+    252)
+  (define-fun VM3Type () Int
+    26)
+  (define-fun C4_VM1 () Int
+    0)
+  (define-fun C1_VM3 () Int
+    0)
+  (define-fun StorageProv1 () Int
+    2000)
+  (define-fun ProcProv4 () Int
+    4)
+  (define-fun StorageProv3 () Int
+    2000)
+  (define-fun C5_VM3 () Int
+    0)
+  (define-fun MemProv2 () Int
+    3750)
+  (define-fun PriceProv5 () Int
+    128)
+  (define-fun C5_VM5 () Int
+    0)
+  (define-fun MemProv4 () Int
+    7500)
+  (define-fun C4_VM4 () Int
+    0)
+  (define-fun C3_VM5 () Int
+    0)
+  (define-fun StorageProv2 () Int
+    2000)
+  (define-fun C1_VM5 () Int
+    0)
+  (define-fun C1_VM4 () Int
+    1)
+  (define-fun PriceProv4 () Int
+    252)
+  (define-fun MemProv5 () Int
+    3750)
+  (define-fun C2_VM2 () Int
+    1)
+  (define-fun C5_VM4 () Int
+    0)
+  (define-fun PriceProv2 () Int
+    128)
+  (define-fun C3_VM3 () Int
+    1)
+  (define-fun StorageProv4 () Int
+    2000)
+  (define-fun VM1Type () Int
+    27)
+  (define-fun C4_VM3 () Int
+    0)
+  (define-fun VM5Type () Int
+    37)
+  (define-fun MemProv1 () Int
+    7500)
+  (define-fun C3_VM1 () Int
+    0)
+  (define-fun C2_VM4 () Int
+    0)
+  (define-fun StorageProv5 () Int
+    2000)
+  (define-fun ProcProv3 () Int
+    4)
+  (define-fun C4_VM5 () Int
+    1)
+  (define-fun C2_VM5 () Int
+    0)
+  (define-fun ProcProv1 () Int
+    4)
+  (define-fun PriceProv3 () Int
+    252)
+  (define-fun C2_VM3 () Int
+    0)
+  (define-fun MemProv3 () Int
+    7500)
+  (define-fun C4_VM2 () Int
+    0)
+  (define-fun ProcProv5 () Int
+    2)
+  (define-fun VM4Type () Int
+    26)
+  (define-fun C5_VM2 () Int
+    0)
+  (define-fun ProcProv2 () Int
+    2)
+  (define-fun C3_VM2 () Int
+    0)
+  (define-fun C2_VM1 () Int
+    0)
+  (define-fun VM2Type () Int
+    37)
+  (define-fun C1_VM2 () Int
+    0)
+  (define-fun C3_VM4 () Int
+    0)
+  (define-fun C5_VM1 () Int
+    1)
+  (define-fun C1_VM1 () Int
+    0)
+)
+(objectives
+ ( 20)
+ ((+ 0 PriceProv1 PriceProv2 PriceProv3 PriceProv4 PriceProv5) 1012)
+)
+(:added-eqs                   112930
+ :arith-eq-adapter            32594
+ :arith-bound-propagations-lp 1101
+ :arith-conflicts             97
+ :arith-diseq                 120728
+ :arith-fixed-eqs             1617
+ :arith-lower                 117132
+ :arith-make-feasible         25938
+ :arith-max-columns           134
+ :arith-max-rows              17
+ :arith-upper                 154732
+ :binary-propagations         635850
+ :conflicts                   2630
+ :decisions                   61296
+ :del-clause                  33809
+ :final-checks                54
+ :max-memory                  43.46
+ :maxsat-cores                12
+ :memory                      43.26
+ :minimized-lits              24887
+ :mk-bool-var                 59758
+ :mk-clause                   34971
+ :mk-clause-binary            3651
+ :num-allocs                  70313882
+ :num-checks                  90
+ :pb-conflicts                1617
+ :pb-predicates               384
+ :pb-propagations             1786
+ :pb-resolves                 1615
+ :propagations                888629
+ :restarts                    7
+ :rlimit-count                5850368
+ :solve-eqs-elim-vars         2
+ :solve-eqs-steps             16
+ :time                        0.35
+ :total-time                  0.36)
