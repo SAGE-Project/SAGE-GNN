@@ -2,15 +2,13 @@ import os
 import csv
 import re
 
-
 # Function to extract parameters from filenames
 def extract_parameters(filename):
-    # Pattern for SecureWeb_RGCN files
+    # Adjust patterns based on your use case
     rgcn_pattern = (
-        r"SecureBillingEmail_RGCN_(?P<samples>\d+)_samples_(?P<epochs>\d+)_epochs_(?P<batchsize>\d+)_batchsize_off_(?P<offers>\d+)_(?P<type>lex|nones)"
+        r"Wordpress3_RGCN_(?P<samples>\d+)_samples_(?P<epochs>\d+)_epochs_(?P<batchsize>\d+)_batchsize_off_(?P<offers>\d+)_(?P<type>lex|nones)"
     )
-    # Pattern for SecureWebContainer files
-    container_pattern = r"SecureBillingEmail_off_(?P<offers>\d+)\.out"
+    container_pattern = r"Wordpress3_off_(?P<offers>\d+)\.out"
 
     rgcn_match = re.match(rgcn_pattern, filename)
     if rgcn_match:
@@ -22,20 +20,34 @@ def extract_parameters(filename):
 
     return None, None
 
+import re
 
-# Function to extract metrics (time and price) from a file
 def extract_metrics(filepath):
     time, price = None, None
     with open(filepath, "r") as f:
-        for line in f:
-            if ":total-time" in line:
-                time = float(line.split(":total-time")[-1].strip().strip(")"))
-            if "(+ 0 PriceProv" in line or "(+ 0 " in line:
-                match = re.search(r"\)\s+(\d+)\)", line)
-                if match:
-                    price = float(match.group(1))
-    return time, price
+        lines = f.readlines()
 
+    # Look for total time
+    for line in lines:
+        if ":total-time" in line:
+            match = re.search(r":total-time\s+([\d.]+)", line)
+            if match:
+                time = float(match.group(1))
+
+    # Look for the price in the objectives section
+    objectives_section = False
+    for line in lines:
+        # Start parsing after finding "(objectives"
+        if "(objectives" in line:
+            objectives_section = True
+
+        if objectives_section:
+            match = re.search(r"\)\s+(\d+)", line)
+            if match:
+                price = int(match.group(1))  # Convert to int since price is an integer
+                break  # Stop searching after finding the price
+
+    return time, price
 
 # Function to process the directory and extract all data
 def process_directory(directory):
@@ -73,7 +85,6 @@ def process_directory(directory):
         if file_type == "rgcn":
             data.append(entry)
         elif file_type == "container":
-            # Store container entries for specific offer values
             container_data[entry["offers"]].append(entry)
 
     # Sort the data by offers
@@ -82,17 +93,14 @@ def process_directory(directory):
     # Add N/A entries before the matching container data
     final_data = []
     for offers in sorted(container_data.keys()):
-        # Prepend N/A line for each offer category
         for entry in container_data[offers]:
             final_data.append({
                 "samples": "N/A", "epochs": "N/A", "batchsize": "N/A", "offers": offers,
                 "type": "N/A", "time": entry["time"], "price": entry["price"]
             })
-        # Add the actual data for the given offer
         final_data.extend([item for item in data if item["offers"] == offers])
 
     return final_data
-
 
 # Function to write extracted data to a CSV file
 def write_data_to_csv(data, output_file):
@@ -111,7 +119,7 @@ def write_data_to_csv(data, output_file):
 # Main function
 def main():
     # Hardcoded input directory and output file
-    input_directory = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/SecureBillingEmail"  # Replace with your directory path
+    input_directory = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/Wordpress3/"  # Replace with your directory path
     output_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/utils/output.csv"  # Replace with your desired output file path
 
     # Process directory and extract data

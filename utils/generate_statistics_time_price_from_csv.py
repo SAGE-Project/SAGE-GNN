@@ -12,31 +12,38 @@ def process_csv(input_file, output_file):
         rows = list(reader)
 
     # Initialize counters for mismatches
-    time_mismatch_count = {20: 0, 27: 0, 40: 0, 250: 0, 500: 0}
-    price_mismatch_count = {20: 0, 27: 0, 40: 0, 250: 0, 500: 0}
+    time_mismatch_count = {20: 0, 40: 0, 250: 0, 500: 0}
+    price_mismatch_count = {20: 0, 40: 0, 250: 0, 500: 0}
+
+    # Initialize counters for smaller than reference values
+    price_smaller_count = {20: 0, 40: 0, 250: 0, 500: 0}
+    time_smaller_count = {20: 0, 40: 0, 250: 0, 500: 0}
 
     # Initialize lists to store mismatches
-    time_mismatches = {20: [], 27: [], 40: [], 250: [], 500: []}
-    price_mismatches = {20: [], 27: [], 40: [], 250: [], 500: []}
+    time_mismatches = {20: [], 40: [], 250: [], 500: []}
+    price_mismatches = {20: [], 40: [], 250: [], 500: []}
 
     # Reference values for comparison
     reference_values = {
-        20: {'time': 0.3, 'price': 3759.0},
-        27: {'time': 0.25, 'price': 2400.0},
-        40: {'time': 0.62, 'price': 2676.0},
-        250: {'time': 3.15, 'price': 1622.0},
-        500: {'time': 10.38, 'price': 1582.0}
+        20: {'time': 1.45, 'price': 1777},
+        27: {'time': 0.46, 'price': 1440},
+        40: {'time': 5.05, 'price': 1396},
+        250: {'time': 28.62, 'price': 1260},
+        500: {'time': 146.13, 'price': 1210}
     }
 
     # Create lists for rows by offer group
-    offer_groups = {20: [], 27: [], 40: [], 250: [], 500: []}
+    offer_groups = {20: [], 40: [], 250: [], 500: []}
 
     # Group rows by offer
     for row in rows:
         if not is_na(row["Price"]) and not is_na(row["Time"]):  # Only process valid rows
-            offer = int(row["Offers"])
-            if offer in offer_groups:
-                offer_groups[offer].append(row)
+            try:
+                offer = int(row["Offers"])
+                if offer in offer_groups:
+                    offer_groups[offer].append(row)
+            except ValueError:
+                print(f"Skipping invalid offer: {row['Offers']}")
 
     # Open the output file in write mode
     with open(output_file, mode='w') as outfile:
@@ -46,46 +53,57 @@ def process_csv(input_file, output_file):
 
         # Iterate through offer groups and check time and price conditions
         for offer, rows_in_group in offer_groups.items():
+            if offer not in reference_values:
+                print_to_file(f"Warning: No reference values for offer {offer}")
+                continue  # Skip processing if no reference value for this offer
+
             reference_time = reference_values[offer]['time']
             reference_price = reference_values[offer]['price']
 
-            # Compare each row within the same offer group
+            # Initialize counters for current group
+            group_time_mismatch_count = 0
+            group_price_mismatch_count = 0
+            group_time_smaller_count = 0
+            group_price_smaller_count = 0
+
+            # Process each row for this offer group
             for i, row in enumerate(rows_in_group):
                 current_time = float(row["Time"])
                 current_price = float(row["Price"])
 
                 # Compare price to reference price
                 if current_price != reference_price:
-                    price_mismatch_count[offer] += 1
+                    group_price_mismatch_count += 1
                     price_mismatches[offer].append(f"Price mismatch at line {i + 1}: {row}")
 
                 # Compare time to reference time
                 if current_time > reference_time:
-                    time_mismatch_count[offer] += 1
+                    group_time_mismatch_count += 1
                     time_mismatches[offer].append(f"Time mismatch at line {i + 1}: {row}")
 
-        # Print results with reference values
-        for offer in [20, 27, 40, 250, 500]:
-            reference_time = reference_values[offer]['time']
-            reference_price = reference_values[offer]['price']
+                # Check if current price is smaller than the reference price for this offer
+                if current_price < reference_price:
+                    group_price_smaller_count += 1
 
-            # Print price mismatch details
+                # Check if current time is smaller than the reference time for this offer
+                if current_time < reference_time:
+                    group_time_smaller_count += 1
+
+            # Print only once for each offer group
             print_to_file(
-                f"\nPrice ({reference_price}) mismatch count for offers {offer}: {price_mismatch_count[offer]} out of {len(offer_groups[offer])} comparisons")
+                f"Price ({reference_price}) mismatch count for offers {offer}: {group_price_mismatch_count} out of {len(rows_in_group)} comparisons")
             for mismatch in price_mismatches[offer]:
                 print_to_file(mismatch)
 
-            # Print time mismatch details
             print_to_file(
-                f"\nTime ({reference_time}) mismatch count for offers {offer}: {time_mismatch_count[offer]} out of {len(offer_groups[offer])} comparisons")
+                f"Time ({reference_time}) mismatch count for offers {offer}: {group_time_mismatch_count} out of {len(rows_in_group)} comparisons")
             for mismatch in time_mismatches[offer]:
                 print_to_file(mismatch)
 
-
 # Main function
 def main():
-    input_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/utils/generate_statistics_in_csv_secure_web.csv"  # Replace with the path to your CSV file
-    output_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/utils/generate_statistics_time_price_from_csv.out"  # Replace with the path to your CSV file
+    input_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/utils/generate_statistics_in_csv_wordpress3.csv"  # Replace with the path to your CSV file
+    output_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/utils/generate_statistics_time_price_from_csv_wordpress3.out"  # Replace with the path to your CSV file
     process_csv(input_file, output_file)
 
 
