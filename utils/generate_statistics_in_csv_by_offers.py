@@ -6,9 +6,9 @@ import re
 def extract_parameters(filename):
     # Adjust patterns based on your use case
     rgcn_pattern = (
-        r"Wordpress3_RGCN_(?P<samples>\d+)_samples_(?P<epochs>\d+)_epochs_(?P<batchsize>\d+)_batchsize_off_(?P<offers>\d+)_(?P<type>lex|nones)"
+        r"Wordpress4_RGCN_(?P<samples>\d+)_samples_(?P<epochs>\d+)_epochs_(?P<batchsize>\d+)_batchsize_off_(?P<offers>\d+)_(?P<type>lex|nones)"
     )
-    container_pattern = r"Wordpress3_off_(?P<offers>\d+)\.out"
+    container_pattern = r"Wordpress4_off_(?P<offers>\d+)\.out"
 
     rgcn_match = re.match(rgcn_pattern, filename)
     if rgcn_match:
@@ -119,7 +119,7 @@ def write_data_to_csv(data, output_file):
 # Main function
 def main():
     # Hardcoded input directory and output file
-    input_directory = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/Wordpress3/"  # Replace with your directory path
+    input_directory = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/Wordpress4/"  # Replace with your directory path
     output_file = "/Users/madalinaerascu/PycharmProjects/SAGE-GNN/utils/output.csv"  # Replace with your desired output file path
 
     # Process directory and extract data
