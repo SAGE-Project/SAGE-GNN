@@ -16,7 +16,7 @@ class ManeuverProblem:
         self.restrictionsList = []  # list of restrictions
         self.IpInfo = {}  # list with other information
         self.applicationName = None
-        self.wpInst = 0
+        self.wpInst = 4
 
         logging.basicConfig()
         

@@ -1,3 +1,5 @@
+import pprint
+
 from z3 import *
 from Solvers.Core.ManuverSolver import ManuverSolver
 import time
@@ -12,8 +14,9 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         :return: None
         """
         if self.solverTypeOptimize:
-            set_option(verbose=10)
+            #set_option(verbose=10)
             self.solver = Optimize()
+            #self.solver.set(priority='pareto')
         else:
             self.solver = Solver()
             self.solver.set(unsat_core=True)
@@ -405,6 +408,7 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         if fileName is None: return
         with open(fileName, 'w+') as fo:
             fo.write(self.solver.sexpr())
+            fo.write('(get-model)\n')
             fo.write('(get-objectives)\n')
             fo.write('(exit)')
         fo.close()
@@ -486,7 +490,9 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
             for k in range(self.nrVM):
                 vms_type.append(model[self.vmType[k]])
             #print(vms_type)
-            # print("objectives ", self.solver.objectives())
+
+            pprint.pprint(a_mat)
+            print(vms_type)
         else:
             print("UNSAT")
         if self.solverTypeOptimize:

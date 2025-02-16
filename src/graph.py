@@ -92,23 +92,39 @@ class Graph:
                     add_edge_features(edge)
         links_exists = defaultdict(dict)
         for comp_idx, comp_links in enumerate(assign_matr):
+            #print("???????? ", comp_idx, comp_links)
             type_indexes = [0] * int(len(vm_nodes) / surrogate_result)
+            #print("type_indexes", type_indexes)
             for vm_idx, vm_linked in enumerate(comp_links):
+                #print("==========", vm_idx, vm_linked)
                 node1 = next((x for x in component_nodes if x.id == comp_idx + 1))
+                #print("node1", node1)
                 type_vm = output['types_of_VMs'][vm_idx] - 1
+                # if type_vm == -1:
+                #     type_vm = 1
+                #print("type_vm", type_vm)
                 vm_type_idx = surrogate_result * type_vm + vm_idx
+                #print("vm_type_idx", vm_type_idx)
                 type_indexes[type_vm] = type_indexes[type_vm] + 1
+
                 if vm_linked:
                     node2 = next((x for x in vm_nodes if x.id == self.vm_index_start + vm_type_idx))
                     link = Edge(node1, node2, vm_linked)
+                    #print("links_exists", links_exists.keys())
                     links_exists[node1.id][node2.id] = True
                     self.links.append(link)
 
+        # print("links_exists=", links_exists)
+        # print("component_nodes=", component_nodes)
         for comp in component_nodes:
-            #print("len(component_nodes)", len(component_nodes))
+            if comp.id not in links_exists.keys():
+                # print("comp.id", comp.id, links_exists.keys())
+                links_exists[comp.id] = {0: True}
+                #continue
+            # print("links_exists==", links_exists)
             for vm in vm_nodes:
                 if not links_exists.get(comp.id).get(vm.id):
-                    #print("vm, comp", vm, comp)
+                    # print("vm, comp", vm, comp)
                     link = Edge(comp, vm, 0)
                     self.links.append(link)
 

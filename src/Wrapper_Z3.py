@@ -1,4 +1,6 @@
 import json
+import pprint
+
 from Solvers.Core.ProblemDefinition import ManeuverProblem
 from src.init import log
 import src.smt
@@ -6,7 +8,9 @@ import numpy as np
 import uuid
 from z3 import *
 
-def add_pred_soft_constraints(solver, prediction, mode):
+constraints = []
+
+def add_pred_soft_constraints(solver, prediction):
     # prediction is a matrix of size (nr comp) * (nr vms * nr offers)
     constraints = []
     nrOffers = solver.nrOffers
@@ -14,6 +18,7 @@ def add_pred_soft_constraints(solver, prediction, mode):
     nrComponents = solver.nrComp
     for comp_idx in range(nrComponents):
         pred_comp = prediction[comp_idx]
+        print(len(pred_comp))
         matrix = np.reshape(pred_comp, (nrOffers, nrVms))
         print("matrix ", matrix)
         for vm_idx in range(solver.nrVM):
@@ -21,59 +26,35 @@ def add_pred_soft_constraints(solver, prediction, mode):
             placements = [i for i, x
                           in enumerate(pred_comp_vm)
                           if x == 1]
-            #print("placements ", placements)
+            print("placements ", placements)
             a_matrix_index = comp_idx * solver.nrVM + vm_idx
-            # I'm already in the gnn model
+            if len(placements) != 0:
+                constraints.append(solver.a[a_matrix_index] == 1)
+            else:
+                constraints.append(solver.a[a_matrix_index] == 0)
+            for placement in placements:
+                vmType = placement #+ 1
 
-            #print("solver.sb_option ", solver.sb_option)
-            #print("mode", mode)
-            if solver.sb_option != "None" and mode =="gnn+pseudob":
-                print("pseudo-boolean constraints")
-                if len(placements) != 0:
-                    constraints.append(solver.a[a_matrix_index] == 1)
-                else:
-                    constraints.append(solver.a[a_matrix_index] == 0)
-                for placement in placements:
-                    vmType = placement #+ 1
+                #constraints.append(solver.vmType[vm_idx] == vmType)
+                #       solver.MemProv[vm_idx] == solver.offers_list[vmType][2],
+                #       solver.StorageProv[vm_idx] == solver.offers_list[vmType][3],
+                #       solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
 
-                    #constraints.append(solver.vmType[vm_idx] == vmType)
-                    #       solver.MemProv[vm_idx] == solver.offers_list[vmType][2],
-                    #       solver.StorageProv[vm_idx] == solver.offers_list[vmType][3],
-                    #       solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
+                constraints.append(solver.ProcProv[vm_idx] == solver.offers_list[vmType][1])
+                constraints.append(solver.MemProv[vm_idx] == solver.offers_list[vmType][2])
+                constraints.append(solver.StorageProv[vm_idx] == solver.offers_list[vmType][3])
+                constraints.append(solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
 
-                    constraints.append(solver.vmType[vm_idx] == vmType)
-                    # constraints.append(solver.ProcProv[vm_idx] == solver.offers_list[vmType][1])
-                    # constraints.append(solver.MemProv[vm_idx] == solver.offers_list[vmType][2])
-                    # constraints.append(solver.StorageProv[vm_idx] == solver.offers_list[vmType][3])
-                    # constraints.append(solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
-                    print("constraints=", constraints)
-            elif mode == "gnn+initv": #solver.sb_option might be "None" or not
-                print("set-initial-value")
-                if len(placements) != 0:
-                    solver.solver.set_initial_value(solver.a[a_matrix_index], 1)
-                else:
-                    solver.solver.set_initial_value(solver.a[a_matrix_index], 0)
-                for placement in placements:
-                    vmType = placement  # + 1
-
-                    # constraints.append(solver.vmType[vm_idx] == vmType)
-                    #       solver.MemProv[vm_idx] == solver.offers_list[vmType][2],
-                    #       solver.StorageProv[vm_idx] == solver.offers_list[vmType][3],
-                    #       solver.PriceProv[vm_idx] == solver.offers_list[vmType][4])
-
-                    solver.solver.set_initial_value(solver.vmType[vm_idx], vmType)
-                    # solver.solver.set_initial_value(solver.ProcProv[vm_idx], solver.offers_list[vmType][1])
-                    # solver.solver.set_initial_value(solver.MemProv[vm_idx], solver.offers_list[vmType][2])
-                    # solver.solver.set_initial_value(solver.StorageProv[vm_idx], solver.offers_list[vmType][3])
-                    # solver.solver.set_initial_value(solver.PriceProv[vm_idx], solver.offers_list[vmType][4])
-
-    # This is for solver.sb_option != "None" and prediction =="gnn+pseudob":
     constraints = list(set(constraints))
-    print("constraints ", constraints)
-    constraints.append(len(constraints))
-    if solver.sb_option != "None" and mode == "gnn+pseudob":
-        print("None, gnn+pseudob")
+    # I'm already in the gnn model
+    if solver.sb_option != "None":
+        print("at most")
+        constraints.append(len(constraints))
         solver.solver.add(AtMost(constraints))
+    else:
+        print("add soft")
+        print("constraints", len(constraints), constraints)
+        solver.solver.add_soft(constraints)
 
 
 # def add_pred_soft_constraints_sim(solver, prediction):
@@ -85,7 +66,7 @@ def add_pred_soft_constraints(solver, prediction, mode):
 
 
 class Wrapper_Z3:
-    def __init__(self, symmetry_breaker="None", solver_id="z3"):
+    def __init__(self, symmetry_breaker="FVPR", solver_id="z3"):
         self.symmetry_breaker = symmetry_breaker
         self.solver_id = solver_id
 
@@ -95,10 +76,9 @@ class Wrapper_Z3:
             offers_json,
             prediction=None,
             prediction_sim=None,
-            # inst != 0 only for Wordpress
-            inst=0,
-            out=True,
-            mode=None
+            inst = 8,
+            out=True
+            #out=False
     ):
         SMTsolver = src.smt.getSolver(self.solver_id)
         availableConfigurations = []
@@ -116,14 +96,14 @@ class Wrapper_Z3:
         problem.readConfigurationJSON(
             application_model_json, availableConfigurations, inst
         )
-        print("out=", out)
         if out:
             SMTsolver.init_problem(problem, "optimize", sb_option=self.symmetry_breaker,
-                                   smt2lib=f"../Output/SMT-LIB/" + application_model_json["application"] + "_" + str(uuid.uuid4()))
+                                   smt2lib=f"/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/Wordpress8/" + application_model_json["application"] + "_" + str(uuid.uuid4()))
         else:
             SMTsolver.init_problem(problem, "optimize", sb_option=self.symmetry_breaker)
         if prediction is not None:
-            add_pred_soft_constraints(SMTsolver, prediction, mode)
+            add_pred_soft_constraints(SMTsolver, prediction)
+        print("prediction ", prediction)
         # elif prediction_sim is not None:
         #     add_pred_soft_constraints_sim(SMTsolver, prediction_sim)
         price, distr, runtime, a_mat, vms_type = SMTsolver.run()

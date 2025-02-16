@@ -1,0 +1,11 @@
+    for file in Wordpress8_RGCN_5636_samples_100_*; do
+        (
+            z3 -st "$file" &> "${file}.out" &
+            z3_pid=$!
+            (
+                sleep 600
+                kill $z3_pid
+            ) &
+            wait $z3_pid
+        )
+    done
