@@ -81,4 +81,4 @@ Using the already trained GNN models (from Models/GNNs/SecureWebContainer/), and
 
 ## License
 
-This project is licensed under the [BSD 3-Clause License](LICENSE).
+This project is licensed under the [BSD 3-Clause License](LICENCE).
