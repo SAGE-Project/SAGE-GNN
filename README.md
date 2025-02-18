@@ -15,7 +15,9 @@ With the rising importance of Cloud deployment, organizations face the intricate
 
 This project introduces a unique approach combining Graph Neural Networks (GNNs) and the SMT solver Z3. Leveraging GNNs' capability to interpret graph-structured data, we model past deployments as graphs, enabling the prediction of optimal VM assignments based on historical data.
 
-By using these GNN-based predictions as soft constraints in Z3, we enhance search efficiency, making the deployment process both more efficient and cost-effective.
+By using these GNN-based predictions as soft constraints in Z3, we enhance search efficiency, making the deployment process both more efficient and cost-effective in many cases.
+
+This repository accompanies the paper *Infusing Formal Methods into Ops-related Practices: Case Studies in Resource Allocation in the Cloud* submitted to the [Journal of Systems and Software](https://www.sciencedirect.com/journal/journal-of-systems-and-software). 
 
 
 ## Features
@@ -28,7 +30,7 @@ By using these GNN-based predictions as soft constraints in Z3, we enhance searc
    - Construct and train the GNN model able to predict component-to-VM assignments and VM Offer types.
    - Save trained model for future use.
    - Explore the implementation: 🔗 [src/trainRGCN.py](./src/trainRGCN.py)
-   - 🔗 Saved Model: [./Models_20_7_SecureBillingEmail-improved-Gini/model_RGCN_1000_samples_100_epochs_32_batchsize.pth](./Models_20_7_SecureBillingEmail-improved-Gini/model_RGCN_1000_samples_100_epochs_32_batchsize.pth)
+   - 🔗 Saved Model: [Models/GNNs/Models_20_7_Datasets-improved-Gini/Models_20_7_SecureBillingEmail-improved-Gini/model_RGCN_1000_samples_100_epochs_32_batchsize.pth](./Models/GNNs/Models_20_7_Datasets-improved-Gini/Models_20_7_SecureWebContainer-improved-Gini/model_RGCN_1000_samples_100_epochs_32_batchsize.pth)
 
 3. **Integration with SMT Solver Z3:**
    - Transform GNN predictions into soft constraints.
@@ -72,10 +74,16 @@ Please ensure you have these dependencies installed and configured correctly bef
 
 ## Usage
 
-Using the already trained GNN models (from Models/GNNs/), and the an application descriptions (from Models/json/) compare the results between:
-   - Base solver,  
-   - Base+GNN,
-   - See: 🔗 [src/comparison.py](./src/comparison.py)
+Using the already trained GNN models ([Models/GNNs](Models/GNNs/)) and an application description ([Models/json](Models/json/)) **compare** the results between:
+   - Base solver, and
+   - Base solver augumented with softconstraints extracted from the GNN (Base solver + GNN),
+   - See: 🔗 [src/comparison.py](./src/comparison.py). 
+   - The output are SMT-LIB files describing a constraint optimization problem together with the solution. See: [Output/SMT-LIB/SecureWebContainer](Output/SMT-LIB/SecureWebContainer)
+
+Additionally, statistics can be run to answer the following research questions:
+   - **RQ1**: How does scalability of the hybrid approach vary with the number of available VM Offers and with increasing number of component instances which also changes the dynamics of component interactions? See: [utils/RQ1/scalability_GNN_offers.py](utils/RQ1/scalability_GNN_offers.py)
+   - **RQ2**: Is there a correlation between the GNN predictions and the optimal solution? Furthermore, is there a relationship between solution time and the optimal solution? See: [utils/RQ2/price-optimality.py](utils/RQ2/price-optimality.py)
+   - **RQ3**: Are there specific GNNs tailored for particular use cases that simultaneously predict well the assignments of components to VMs while minimizing execution time and achieving optimal solution? See: [utils/RQ3/readme](utils/RQ3/readme)
 
 ## License
 
