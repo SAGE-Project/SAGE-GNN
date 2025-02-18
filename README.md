@@ -22,13 +22,13 @@ By using these GNN-based predictions as soft constraints in Z3, we enhance searc
 
 1. **Dataset Generation:** 
    - Generate a dataset to train the GNN model for the application deployment.
-   - For a detailed look into the data generation process: 🔗 [src/generate_dataset.py](./src/generate_dataset.py)
+   - For a detailed look into the data generation process run: 🔗 [src/generate_dataset.py](./src/generate_dataset.py)
 
 2. **GNN Model Implementation:**
    - Construct and train the GNN model able to predict component-to-VM assignments and VM Offer types.
    - Save trained model for future use.
-   - Explore the implementation: 🔗 [src/gnn.py](./src/trainRGCN.py)
-   - 🔗 Saved Model: [Models/GNNs/SecureWebContainer/model_RGCN_50_samples_100_epochs.pth](./Models/GNNs/SecureWebContainer/model_RGCN_50_samples_100_epochs.pth)
+   - Explore the implementation: 🔗 [src/trainRGCN.py](./src/trainRGCN.py)
+   - 🔗 Saved Model: [./Models_20_7_SecureBillingEmail-improved-Gini/model_RGCN_1000_samples_100_epochs_32_batchsize.pth](./Models_20_7_SecureBillingEmail-improved-Gini/model_RGCN_1000_samples_100_epochs_32_batchsize.pth)
 
 3. **Integration with SMT Solver Z3:**
    - Transform GNN predictions into soft constraints.
@@ -72,11 +72,9 @@ Please ensure you have these dependencies installed and configured correctly bef
 
 ## Usage
 
-Using the already trained GNN models (from Models/GNNs/SecureWebContainer/), and the SecureWebContainer descriptions (from Models/json/) compare the results between:
-   - Base, 
-   - Base+FVPR, 
-   - Base+GNN, 
-   - Base+GNN+FVPR
+Using the already trained GNN models (from Models/GNNs/), and the an application descriptions (from Models/json/) compare the results between:
+   - Base solver,  
+   - Base+GNN,
    - See: 🔗 [src/comparison.py](./src/comparison.py)
 
 ## License

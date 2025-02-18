@@ -11,19 +11,19 @@ with open("../Models/json/Wordpress.json", "r") as file:
 with open("../Data/json/DigitalOcean.json", "r") as file:
     offers_do = json.load(file)
 
-#1.
+#1. Base solver
 # wrapper_z3 = Wrapper_Z3(symmetry_breaker="None")
 # print(wrapper_z3.solve(application, offers_do))
 #
-# #2.
+# #2. Base solver + FVPR symmetry breaker
 # wrapper_z3 = Wrapper_Z3(symmetry_breaker="FVPR")
 # print(wrapper_z3.solve(application, offers_do))
 
-# 3.
+# 3. Base solver + GNN (as soft constraints)
 wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="None")
 print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn"))
 
-# 4.
+# 4. Base solver + FVPR symmetry breaker + GNN (as soft constraints)
 # wrapper_gnn_z3 = Wrapper_GNN_Z3(symmetry_breaker="FVPR")
 # print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn"))
 
