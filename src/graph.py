@@ -64,10 +64,10 @@ class Graph:
                 existing_edge.add_features(eg.features)
             else:
                 self.edges.append(eg),
-
         for res in restrictions:
             node1 = None
             node2 = None
+            print("restrictions ", restrictions)
             if res["type"] in ["UpperBound", "LowerBound", "EqualBound"] and len(res["compsIdList"]) == 2:
                 node1 = next((x for x in component_nodes if x.id == res["compsIdList"][0]))
                 node2 = next((x for x in component_nodes if x.id == res["compsIdList"][1]))
@@ -94,9 +94,8 @@ class Graph:
         for comp_idx, comp_links in enumerate(assign_matr):
             #print("???????? ", comp_idx, comp_links)
             type_indexes = [0] * int(len(vm_nodes) / surrogate_result)
-            #print("type_indexes", type_indexes)
             for vm_idx, vm_linked in enumerate(comp_links):
-                #print("==========", vm_idx, vm_linked)
+                #print("vm_idx, vm_linked", vm_idx, vm_linked)
                 node1 = next((x for x in component_nodes if x.id == comp_idx + 1))
                 #print("node1", node1)
                 type_vm = output['types_of_VMs'][vm_idx] - 1
@@ -114,7 +113,7 @@ class Graph:
                     links_exists[node1.id][node2.id] = True
                     self.links.append(link)
 
-        # print("links_exists=", links_exists)
+        #print("links_exists=", links_exists)
         # print("component_nodes=", component_nodes)
         for comp in component_nodes:
             if comp.id not in links_exists.keys():
@@ -124,7 +123,7 @@ class Graph:
             # print("links_exists==", links_exists)
             for vm in vm_nodes:
                 if not links_exists.get(comp.id).get(vm.id):
-                    # print("vm, comp", vm, comp)
+                    #print("vm, comp", vm, comp)
                     link = Edge(comp, vm, 0)
                     self.links.append(link)
 
