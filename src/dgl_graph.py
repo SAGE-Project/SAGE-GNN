@@ -29,6 +29,9 @@ class DGLGraph(DGLDataset):
         link_dest = []
         unlink_src = []
         unlink_dest = []
+
+        print("???", self.graph_init.vm_index_start)
+
         for link in self.graph_init.links:
             if (link.features == 1):
                 link_src.append(link.node1.id - 1)
@@ -43,7 +46,7 @@ class DGLGraph(DGLDataset):
         deployed_dest = [j for i in range(size_components) for j in range(size_vms)]
 
         self.graph = dgl.heterograph({
-            ('component', 'conflict', 'component'): (torch.tensor(components_src), torch.tensor(components_dest)), # component linkedCC
+            ('component', 'binding', 'component'): (torch.tensor(components_src), torch.tensor(components_dest)), # component linkedCC
             ('component', 'linked', 'vm'): (torch.tensor(link_src), torch.tensor(link_dest)), # component linkedCM
             ('component', 'unlinked', 'vm'): (torch.tensor(unlink_src), torch.tensor(unlink_dest))  # component unlinkedCM
         })
@@ -55,9 +58,11 @@ class DGLGraph(DGLDataset):
         labels = [1 for x in self.graph_init.nodes]
         edge_features_conflicts = [x.features for x in self.graph_init.edges]
 
+        #print("edge_features_conflicts", edge_features_conflicts)
+
         self.graph.nodes['component'].data['feat'] = torch.from_numpy(np.array(features_components).astype(np.float32))
         self.graph.nodes['vm'].data['feat'] = torch.from_numpy(np.array(features_vms).astype(np.float32))
-        self.graph.edges['conflict'].data['feat'] = torch.from_numpy(np.array(edge_features_conflicts).astype(np.float32))
+        self.graph.edges['binding'].data['feat'] = torch.from_numpy(np.array(edge_features_conflicts).astype(np.float32))
 
     def __getitem__(self, i):
         return self.graph
@@ -73,7 +78,7 @@ def print_dataset(dgl_graph):
     print("VM nodes")
     print(dgl_graph.nodes('vm'))
     print("CC LINKS")
-    print(dgl_graph.edges(etype='conflict'))
+    print(dgl_graph.edges(etype='binding'))
     print("CM LINKS")
     print(dgl_graph.edges(etype='linked'))
     print("CM UNLINKS")
