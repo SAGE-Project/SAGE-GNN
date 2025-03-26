@@ -42,6 +42,7 @@ for offer in offers_comb:
     wrapper = Wrapper_Z3()
     with open("../Models/json/Oryx2.json", "r") as file:
         application = json.load(file)
+    # TODO It seems that the LowerBound between 2 components does not work well when creating the output. E.g. {'type': 'LowerBound', 'compsIdList': [1, 2], 'bound': 3} but it should be 'compsIdList': [2, 3],
     result = wrapper.solve(application, offer)
     if result:
         index = index + 1
