@@ -17,7 +17,7 @@ This project introduces a unique approach combining Graph Neural Networks (GNNs)
 
 By using these GNN-based predictions as soft constraints in Z3, we enhance search efficiency, making the deployment process both more efficient and cost-effective in many cases.
 
-This repository accompanies the paper *Infusing Formal Methods into Ops-related Practices: Case Studies in Resource Allocation in the Cloud* submitted to the [Journal of Systems and Software](https://www.sciencedirect.com/journal/journal-of-systems-and-software). 
+This repository accompanies the paper *???* submitted to the [Constraints](https://link.springer.com/journal/10601). 
 
 
 ## Features
