@@ -88,8 +88,6 @@ class ManeuverProblem:
         #print("!!!!!!!!!!!!!!!", partitions)
         return partitions
 
-
-
     def solveCPNrOfInstances(self, choosing_stategy, solutions_limit):
         """
         Start solving components number problem using the chosen solver and available configurations for VM

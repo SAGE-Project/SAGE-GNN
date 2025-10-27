@@ -11,12 +11,12 @@ class Wrapper_GNN_Z3:
         z3_solver = Wrapper_Z3(symmetry_breaker=self.symmetry_breaker)
         if mode == "gnn+initv":
             print("mode = gnn+initv")
-            prediction = self.gnn_predictor.solve(application_model_json, offers_json)
-            solution = z3_solver.solve(application_model_json, offers_json, prediction=prediction, out=True, mode="gnn+initv")
+            prediction = self.gnn_predictor.solve(application_model_json, offers_json, mode=init)
+            solution = z3_solver.solve(application_model_json, offers_json, prediction=prediction, out=True, mode=init)
         elif mode == "gnn+pseudob":
             print("gnn+pseudob")
-            prediction = self.gnn_predictor.solve(application_model_json, offers_json)
-            solution = z3_solver.solve(application_model_json, offers_json, prediction=prediction, out=True, mode="gnn+pseudob")
+            prediction = self.gnn_predictor.solve(application_model_json, offers_json, mode=init)
+            solution = z3_solver.solve(application_model_json, offers_json, prediction=prediction, out=True, mode=init)
         # elif mode == "sim":
         #     sim_perfect_prediction = z3_solver.solve(application_model_json, offers_json, out=True)
         #     solution = z3_solver.solve(application_model_json, offers_json, prediction_sim=sim_perfect_prediction,

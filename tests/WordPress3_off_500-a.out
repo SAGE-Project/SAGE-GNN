@@ -1,0 +1,243 @@
+sat
+(
+  (define-fun MemProv1 () Int
+    61000)
+  (define-fun C1_VM8 () Int
+    0)
+  (define-fun C3_VM5 () Int
+    0)
+  (define-fun C4_VM5 () Int
+    0)
+  (define-fun ProcProv6 () Int
+    32)
+  (define-fun C4_VM6 () Int
+    0)
+  (define-fun C1_VM3 () Int
+    1)
+  (define-fun C4_VM1 () Int
+    0)
+  (define-fun PriceProv4 () Int
+    3309)
+  (define-fun C5_VM2 () Int
+    1)
+  (define-fun C4_VM8 () Int
+    0)
+  (define-fun C3_VM8 () Int
+    0)
+  (define-fun StorageProv6 () Int
+    4000)
+  (define-fun VM7Type () Int
+    124)
+  (define-fun C4_VM4 () Int
+    0)
+  (define-fun C3_VM3 () Int
+    0)
+  (define-fun PriceProv6 () Int
+    2746)
+  (define-fun C3_VM1 () Int
+    0)
+  (define-fun C2_VM1 () Int
+    0)
+  (define-fun C2_VM7 () Int
+    1)
+  (define-fun StorageProv3 () Int
+    4000)
+  (define-fun StorageProv4 () Int
+    4000)
+  (define-fun C2_VM2 () Int
+    0)
+  (define-fun VM2Type () Int
+    128)
+  (define-fun VM5Type () Int
+    64)
+  (define-fun PriceProv2 () Int
+    3480)
+  (define-fun C4_VM2 () Int
+    0)
+  (define-fun C2_VM8 () Int
+    0)
+  (define-fun MemProv2 () Int
+    122000)
+  (define-fun C4_VM7 () Int
+    0)
+  (define-fun MemProv3 () Int
+    128000)
+  (define-fun PriceProv1 () Int
+    2064)
+  (define-fun C5_VM1 () Int
+    0)
+  (define-fun MemProv8 () Int
+    15000)
+  (define-fun PriceProv7 () Int
+    4501)
+  (define-fun ProcProv8 () Int
+    65)
+  (define-fun C2_VM3 () Int
+    0)
+  (define-fun StorageProv1 () Int
+    2000)
+  (define-fun C5_VM3 () Int
+    0)
+  (define-fun MemProv6 () Int
+    244000)
+  (define-fun C1_VM2 () Int
+    1)
+  (define-fun VM3Type () Int
+    52)
+  (define-fun MemProv5 () Int
+    244000)
+  (define-fun VM4Type () Int
+    64)
+  (define-fun C2_VM4 () Int
+    0)
+  (define-fun C1_VM1 () Int
+    1)
+  (define-fun C3_VM4 () Int
+    1)
+  (define-fun VM8Type () Int
+    0)
+  (define-fun C1_VM7 () Int
+    0)
+  (define-fun PriceProv8 () Int
+    0)
+  (define-fun ProcProv7 () Int
+    16)
+  (define-fun MemProv4 () Int
+    244000)
+  (define-fun StorageProv8 () Int
+    8000)
+  (define-fun C1_VM6 () Int
+    0)
+  (define-fun C3_VM6 () Int
+    0)
+  (define-fun ProcProv3 () Int
+    32)
+  (define-fun ProcProv5 () Int
+    32)
+  (define-fun ProcProv2 () Int
+    16)
+  (define-fun C3_VM2 () Int
+    0)
+  (define-fun C5_VM6 () Int
+    0)
+  (define-fun ProcProv1 () Int
+    8)
+  (define-fun C5_VM5 () Int
+    1)
+  (define-fun StorageProv5 () Int
+    4000)
+  (define-fun C5_VM8 () Int
+    0)
+  (define-fun VM6Type () Int
+    32)
+  (define-fun C1_VM4 () Int
+    0)
+  (define-fun ProcProv4 () Int
+    32)
+  (define-fun C5_VM7 () Int
+    0)
+  (define-fun PriceProv3 () Int
+    2342)
+  (define-fun StorageProv2 () Int
+    12000)
+  (define-fun C1_VM5 () Int
+    0)
+  (define-fun C2_VM6 () Int
+    1)
+  (define-fun StorageProv7 () Int
+    4000)
+  (define-fun MemProv7 () Int
+    122000)
+  (define-fun VM1Type () Int
+    227)
+  (define-fun C4_VM3 () Int
+    0)
+  (define-fun C5_VM4 () Int
+    0)
+  (define-fun C2_VM5 () Int
+    0)
+  (define-fun C3_VM7 () Int
+    0)
+  (define-fun PriceProv5 () Int
+    3309)
+)
+(objectives
+ ((+ C1_VM1
+   C1_VM2
+   C1_VM3
+   C1_VM4
+   C1_VM5
+   C1_VM6
+   C1_VM7
+   C1_VM8
+   C2_VM1
+   C2_VM2
+   C2_VM3
+   C2_VM4
+   C2_VM5
+   C2_VM6
+   C2_VM7
+   C2_VM8
+   C3_VM1
+   C3_VM2
+   C3_VM3
+   C3_VM4
+   C3_VM5
+   C3_VM6
+   C3_VM7
+   C3_VM8
+   C4_VM1
+   C4_VM2
+   C4_VM3
+   C4_VM4
+   C4_VM5
+   C4_VM6
+   C4_VM7
+   C4_VM8
+   C5_VM1
+   C5_VM2
+   C5_VM3
+   C5_VM4
+   C5_VM5
+   C5_VM6
+   C5_VM7
+   C5_VM8) 8)
+)
+(:added-eqs                   1087751
+ :arith-eq-adapter            78569
+ :arith-bound-propagations-lp 5361
+ :arith-conflicts             29
+ :arith-diseq                 89206
+ :arith-fixed-eqs             4011
+ :arith-lower                 116634
+ :arith-make-feasible         39285
+ :arith-max-columns           132
+ :arith-max-rows              24
+ :arith-upper                 109718
+ :binary-propagations         2198504
+ :bv-bit2core                 92801
+ :bv-dynamic-diseqs           1292058
+ :bv-dynamic-eqs              2
+ :bv->core-eq                 3838
+ :conflicts                   5689
+ :decisions                   1224313
+ :del-clause                  1407608
+ :final-checks                49
+ :max-memory                  87.82
+ :maxsat-cores                8
+ :memory                      85.08
+ :minimized-lits              6767
+ :mk-bool-var                 162637
+ :mk-clause                   1407929
+ :mk-clause-binary            18949
+ :num-allocs                  2506263584
+ :num-checks                  67
+ :pb-conflicts                536
+ :pb-predicates               7
+ :pb-propagations             6822
+ :pb-resolves                 495
+ :propagations                2432635
+ :restarts                    38
+ :rlimit-count                40687762
+ :time                        2.52
+ :total-time                  2.57)

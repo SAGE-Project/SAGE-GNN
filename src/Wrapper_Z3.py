@@ -56,14 +56,131 @@ def add_pred_soft_constraints(solver, prediction):
         print("constraints", len(constraints), constraints)
         solver.solver.add_soft(constraints)
 
+def add_pred_init_vals(solver, prediction):
+    # prediction is a matrix of size (nr comp) * (nr vms * nr offers)
+    print("in add_pred_init_vals")
+    constraints = []
+    nrOffers = solver.nrOffers
+    nrVms = solver.nrVM
+    nrComponents = solver.nrComp
+    # Component 0 assignments
+    solver.solver.set_initial_value(solver.a[0 * 8 + 0], 1)
+    solver.solver.set_initial_value(solver.a[0 * 8 + 1], 0)
+    solver.solver.set_initial_value(solver.a[0 * 8 + 2], 0)
+    solver.solver.set_initial_value(solver.a[0 * 8 + 3], 1)
+    solver.solver.set_initial_value(solver.a[0 * 8 + 4], 0)
+    solver.solver.set_initial_value(solver.a[0 * 8 + 5], 1)
+    solver.solver.set_initial_value(solver.a[0 * 8 + 6], 0)
+    solver.solver.set_initial_value(solver.a[0 * 8 + 7], 0)
+    # Component 1 assignments
+    solver.solver.set_initial_value(solver.a[1 * 8 + 0], 0)
+    solver.solver.set_initial_value(solver.a[1 * 8 + 1], 0)
+    solver.solver.set_initial_value(solver.a[1 * 8 + 2], 1)
+    solver.solver.set_initial_value(solver.a[1 * 8 + 3], 0)
+    solver.solver.set_initial_value(solver.a[1 * 8 + 4], 0)
+    solver.solver.set_initial_value(solver.a[1 * 8 + 5], 0)
+    solver.solver.set_initial_value(solver.a[1 * 8 + 6], 1)
+    solver.solver.set_initial_value(solver.a[1 * 8 + 7], 0)
+    # # Component 2 assignments
+    solver.solver.set_initial_value(solver.a[2 * 8 + 0], 0)
+    solver.solver.set_initial_value(solver.a[2 * 8 + 1], 0)
+    solver.solver.set_initial_value(solver.a[2 * 8 + 2], 0)
+    solver.solver.set_initial_value(solver.a[2 * 8 + 3], 0)
+    solver.solver.set_initial_value(solver.a[2 * 8 + 4], 0)
+    solver.solver.set_initial_value(solver.a[2 * 8 + 5], 0)
+    solver.solver.set_initial_value(solver.a[2 * 8 + 6], 0)
+    solver.solver.set_initial_value(solver.a[2 * 8 + 7], 0)
+    # # Component 3 assignments
+    solver.solver.set_initial_value(solver.a[3 * 8 + 0], 0)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 1], 0)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 2], 0)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 3], 0)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 4], 0)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 5], 0)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 6], 1)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 7], 0)
+    # # Component 4 assignments
+    solver.solver.set_initial_value(solver.a[4 * 8 + 0], 0)
+    solver.solver.set_initial_value(solver.a[4 * 8 + 1], 1)
+    solver.solver.set_initial_value(solver.a[4 * 8 + 2], 0)
+    solver.solver.set_initial_value(solver.a[4 * 8 + 3], 0)
+    solver.solver.set_initial_value(solver.a[4 * 8 + 4], 0)
+    solver.solver.set_initial_value(solver.a[4 * 8 + 5], 0)
+    solver.solver.set_initial_value(solver.a[4 * 8 + 6], 0)
+    solver.solver.set_initial_value(solver.a[3 * 8 + 7], 1)
+    # ##### VM 0
+    solver.solver.set_initial_value(solver.ProcProv[0], solver.offers_list[432][1])
+    solver.solver.set_initial_value(solver.MemProv[0] , solver.offers_list[432][2])
+    solver.solver.set_initial_value(solver.StorageProv[0], solver.offers_list[432][3])
+    solver.solver.set_initial_value(solver.PriceProv[0], solver.offers_list[432][4])
+    # # VM 1
+    solver.solver.set_initial_value(solver.ProcProv[1], solver.offers_list[340][1])
+    solver.solver.set_initial_value(solver.MemProv[1], solver.offers_list[340][2])
+    solver.solver.set_initial_value(solver.StorageProv[1], solver.offers_list[340][3])
+    solver.solver.set_initial_value(solver.PriceProv[1], solver.offers_list[340][4])
+    # # VM 2
+    solver.solver.set_initial_value(solver.ProcProv[2], solver.offers_list[340][1])
+    solver.solver.set_initial_value(solver.MemProv[2], solver.offers_list[340][2])
+    solver.solver.set_initial_value(solver.StorageProv[2], solver.offers_list[340][3])
+    solver.solver.set_initial_value(solver.PriceProv[2], solver.offers_list[340][4])
+    # # VM 3
+    solver.solver.set_initial_value(solver.ProcProv[3], solver.offers_list[432][1])
+    solver.solver.set_initial_value(solver.MemProv[3], solver.offers_list[432][2])
+    solver.solver.set_initial_value(solver.StorageProv[3], solver.offers_list[432][3])
+    solver.solver.set_initial_value(solver.PriceProv[3], solver.offers_list[432][4])
+    # # VM 4
+    solver.solver.set_initial_value(solver.ProcProv[4], solver.offers_list[340][1])
+    solver.solver.set_initial_value(solver.MemProv[4], solver.offers_list[340][2])
+    solver.solver.set_initial_value(solver.StorageProv[4], solver.offers_list[340][3])
+    solver.solver.set_initial_value(solver.PriceProv[4], solver.offers_list[340][4])
+    # # VM 5
+    solver.solver.set_initial_value(solver.ProcProv[5], solver.offers_list[432][1])
+    solver.solver.set_initial_value(solver.MemProv[5], solver.offers_list[432][2])
+    solver.solver.set_initial_value(solver.StorageProv[5], solver.offers_list[432][3])
+    solver.solver.set_initial_value(solver.PriceProv[5], solver.offers_list[432][4])
+    # # VM 6
+    solver.solver.set_initial_value(solver.ProcProv[6], solver.offers_list[432][1])
+    solver.solver.set_initial_value(solver.MemProv[6], solver.offers_list[432][2])
+    solver.solver.set_initial_value(solver.StorageProv[6], solver.offers_list[432][3])
+    solver.solver.set_initial_value(solver.PriceProv[6], solver.offers_list[432][4])
+    # # VM 7
+    solver.solver.set_initial_value(solver.ProcProv[7], solver.offers_list[432][1])
+    solver.solver.set_initial_value(solver.MemProv[7], solver.offers_list[432][2])
+    solver.solver.set_initial_value(solver.StorageProv[7], solver.offers_list[432][3])
+    solver.solver.set_initial_value(solver.PriceProv[7], solver.offers_list[432][4])
 
-# def add_pred_soft_constraints_sim(solver, prediction):
-#     for idx, vm_type in enumerate(prediction["output"]["types_of_VMs"]):
-#         solver.solver.add_soft(solver.vmType[idx] == vm_type)
-#     a_matrix_flatten = [item for sublist in prediction["output"]["assign_matr"] for item in sublist]
-#     for idx, val in enumerate(a_matrix_flatten):
-#         solver.solver.add_soft(solver.a[idx] == val)
-
+    # with open('out.txt', 'w+') as f:
+    #     for comp_idx in range(nrComponents):
+    #         pred_comp = prediction[comp_idx]
+    #         matrix = np.reshape(pred_comp, (nrOffers, nrVms))
+    #         for vm_idx in range(solver.nrVM):
+    #             pred_comp_vm = matrix[:, vm_idx]
+    #             print("pred_comp_vm ", pred_comp_vm, file=f)
+    #             placements = [i for i, x
+    #                       in enumerate(pred_comp_vm)
+    #                       if x == 1]
+    #             print("placements ", placements)
+    #             a_matrix_index = comp_idx * solver.nrVM + vm_idx
+    #             print("a_matrix_index ",a_matrix_index)
+    #             if len(placements) != 0:
+    #                 print(solver.a[a_matrix_index], '=1', file=f)
+    #                 #print(" = 1", file=f)
+    #                 solver.solver.set_initial_value(solver.a[a_matrix_index], 1)
+    #             else:
+    #                 print(solver.a[a_matrix_index], '=0', file=f)
+    #                 #print(" = 0", file=f)
+    #                 solver.solver.set_initial_value(solver.a[a_matrix_index], 0)
+    #         for placement in placements:
+    #             vmType = placement + 1
+    #             print("vmType ", vmType)
+    #             solver.solver.set_initial_value(solver.ProcProv[vm_idx], solver.offers_list[vmType][1])
+    #             print(solver.ProcProv[vm_idx], solver.offers_list[vmType][1], file=f)
+    #             solver.solver.set_initial_value(solver.MemProv[vm_idx] , solver.offers_list[vmType][2])
+    #             print(solver.MemProv[vm_idx] , solver.offers_list[vmType][2], file=f)
+    #             solver.solver.set_initial_value(solver.StorageProv[vm_idx], solver.offers_list[vmType][3])
+    #             print(solver.StorageProv[vm_idx], solver.offers_list[vmType][3], file=f)
+    #             solver.solver.set_initial_value(solver.PriceProv[vm_idx], solver.offers_list[vmType][4])
+    #             print(solver.PriceProv[vm_idx], solver.offers_list[vmType][4], file=f)
 
 class Wrapper_Z3:
     def __init__(self, symmetry_breaker="FVPR", solver_id="z3"):
@@ -74,9 +191,10 @@ class Wrapper_Z3:
             self,
             application_model_json,
             offers_json,
+            mode=None,
             prediction=None,
-            prediction_sim=None,
-            inst = 8,
+            #prediction_sim=None,
+            inst = 3,
             out=True
             #out=False
     ):
@@ -98,10 +216,12 @@ class Wrapper_Z3:
         )
         if out:
             SMTsolver.init_problem(problem, "optimize", sb_option=self.symmetry_breaker,
-                                   smt2lib=f"/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/Wordpress8/" + application_model_json["application"] + "_" + str(uuid.uuid4()))
+                                   smt2lib=f"/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/SecureWebContainer/" + application_model_json["application"] + "_" + str(uuid.uuid4()))
         else:
             SMTsolver.init_problem(problem, "optimize", sb_option=self.symmetry_breaker)
-        if prediction is not None:
+        if (prediction is not None) and (mode=="init"):
+            add_pred_init_vals(SMTsolver, prediction)
+        elif (prediction is not None) and (mode=="gnn"):
             add_pred_soft_constraints(SMTsolver, prediction)
         print("prediction ", prediction)
         # elif prediction_sim is not None:

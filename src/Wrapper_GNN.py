@@ -7,7 +7,7 @@ from trainRGCN import get_graph_data, to_assignment_matrix, count_matches_and_di
 
 
 class Wrapper_GNN:
-    def __init__(self, model_path="/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Models/GNNs/Models_20_7_Datasets-improved-Gini/Models_20_7_Wordpress-improved-Gini/model_RGCN_5636_samples_100_epochs_1024_batchsize.pth"):
+    def __init__(self, model_path="/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Models/GNNs/wordpress_model_RGCN_1000_samples_100_epochs_128_batchsize.pth"):
         print("in Wrapper_GNN")
         # load pre-existing trained model
         self.model = torch.load(model_path)
@@ -17,7 +17,7 @@ class Wrapper_GNN:
     def solve(self, application_model_json, offers_json):
         # Obtain data in required form (ignore solution)
         # TODO: do not use solve here as it is not really needed
-        app_json = Wrapper_Z3().solve(application_model_json, offers_json, out=False)
+        app_json = Wrapper_Z3().solve(application_model_json, offers_json, out=False, mode="init")
         # Transform into graph data structure
         print("app_json ", app_json)
         graph = get_graph_data(app_json, app_json["application"])

@@ -1,0 +1,47 @@
+unsat
+(error "line 26131 column 10: model is not available")
+(objectives
+ ((+ 0
+   PriceProv1
+   PriceProv2
+   PriceProv3
+   PriceProv4
+   PriceProv5
+   PriceProv6
+   PriceProv7
+   PriceProv8)  (interval (* (- 1) oo) oo))
+)
+(:added-eqs                   7569
+ :arith-eq-adapter            4448
+ :arith-bound-propagations-lp 43
+ :arith-conflicts             28
+ :arith-diseq                 4101
+ :arith-fixed-eqs             454
+ :arith-lower                 926
+ :arith-make-feasible         318
+ :arith-max-columns           1630
+ :arith-max-rows              373
+ :arith-nla-propagate-eq      5080
+ :arith-offset-eqs            166
+ :arith-upper                 698
+ :binary-propagations         48398
+ :bv-bit2core                 36
+ :bv-dynamic-diseqs           7894
+ :bv->core-eq                 5
+ :conflicts                   45
+ :decisions                   57146
+ :del-clause                  33765
+ :max-memory                  78.90
+ :memory                      78.90
+ :minimized-lits              13
+ :mk-bool-var                 17975
+ :mk-clause                   33886
+ :mk-clause-binary            17235
+ :num-allocs                  90194038
+ :num-checks                  1
+ :pb-predicates               7
+ :pb-propagations             40
+ :propagations                48654
+ :rlimit-count                2746992
+ :time                        0.15
+ :total-time                  0.20)

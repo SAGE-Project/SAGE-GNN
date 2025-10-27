@@ -134,12 +134,12 @@ def get_graph_data(json_data, file_name):
     #         if storage > max_storage: max_storage = storage
     #         if price > max_price: max_price = price
 
-    surrogate_result = 6 # Secure Web Container
+    #surrogate_result = 6 # Secure Web Container
         #surrogate_result = 5  # Secure Billing Email
-        #surrogate_result = 11  #Oryx2
-        #surrogate_result = 8  # Wordpress3
-        #surrogate_result = 10  # Wordpress4
-        #surrogate_result = 12  # Wordpress5
+    #surrogate_result = 11  #Oryx2
+    surrogate_result = 8  # Wordpress3
+    #surrogate_result = 10  # Wordpress4
+    #surrogate_result = 12  # Wordpress5
         #surrogate_result = 13  # Wordpress6
         #surrogate_result = 15  # Wordpress7
         #surrogate_result = 19  # Wordpress8
@@ -216,19 +216,20 @@ def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
             assign_matrix[component][vm] = 0
         else:
             assign_matrix[component][vm] = 1
+    ##### for comparison.py only
     # print("Each row represents a component")
     # # hardcoding
-    # # surrogate_result = 6 # Secure Web Container
+    # #surrogate_result = 6 # Secure Web Container
     # # surrogate_result = 5  # Secure Billing Email
     # # surrogate_result = 11  #Oryx2
-    # surrogate_result = 8  # Wordpress3
-    # # surrogate_result = 10  # Wordpress4
-    # # surrogate_result = 12  # Wordpress5
+    # #surrogate_result = 8  # Wordpress3
+    # surrogate_result = 10  # Wordpress4
+    # #surrogate_result = 12  # Wordpress5
     # # surrogate_result = 13  # Wordpress6
     # # surrogate_result = 15  # Wordpress7
     # # surrogate_result = 19  # Wordpress8
     # # VM types = 7 from training
-    # numb_VM_Types = 500
+    # numb_VM_Types = 40
     # for i in range(components_nr):
     #     print(assign_matrix[i], " ")
     # print("Each matrix is for a component where rows represents a VM and cols types of a VM")
@@ -238,16 +239,12 @@ def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
     #
     # assign_matrix = np.array(assign_matrix)
     #
-    # for row in assign_matrix:
-    #     for vm in range(surrogate_result):
-    #         start = vm * numb_VM_Types
-    #         end = start + numb_VM_Types
-    #         batch = row[start:end]
-    #
-    #         if np.sum(batch) > 1:
-    #             first_one = np.argmax(batch)  # Get the first occurrence of '1' in the batch
-    #             row[start:end] = 0  # Reset the batch
-    #             row[start + first_one] = 1  # Keep only the first '1'
+    # for i in range(assign_matrix.shape[0]):
+    #     row = assign_matrix[i]
+    #     if np.sum(row) > 1:
+    #         first_one = np.argmax(row)  # global argmax across the row
+    #         row[:] = 0  # zero the whole row
+    #         row[first_one] = 1  # keep only the first 1
     #
     # print("AFTER removal of duplicate 1s: Each row represents a component")
     # for i in range(components_nr):
@@ -255,6 +252,7 @@ def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
     # print("Each matrix is for a component where rows represents a VM and cols types of a VM")
     # for i in range(components_nr):
     #     print("component ", i)
+    #     np.set_printoptions(threshold=np.inf)
     #     print(np.array(assign_matrix[i]).reshape(surrogate_result, numb_VM_Types))
 
     print("assign_matrix ", assign_matrix)
@@ -288,7 +286,7 @@ def split_into_batches(arr, batch_size):
 
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
-    data = read_jsons('/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Datasets/DatasetsImprovedGini/DsSecureWebContainer_20_7_improved_Gini')
+    data = read_jsons('/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Datasets/DatasetsInitial/DsOryx2_20_7/')
     #print("AFTER DIR READ")
 
     graphs = []
@@ -333,7 +331,7 @@ if __name__ == '__main__':
     validation = arr[size1:size1 + size2].tolist()
     test = arr[size1 + size2:].tolist()
 
-    model = Model(8, 300, 5, ['binding', 'linked', 'unlinked'])
+    model = Model(8, 10, 5, ['binding', 'linked', 'unlinked'])
 
     print("model = ", model)
 
@@ -363,7 +361,7 @@ if __name__ == '__main__':
         y_pred = []
         y_true = []
 
-        batch_size = 32
+        batch_size = 128
         batched_training = split_into_batches(train, batch_size)
         for train_graphs in batched_training:
             loss_list_batch = []
@@ -483,7 +481,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/temp/loss_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/loss_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -493,7 +491,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/temp/acc_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/acc_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -566,4 +564,4 @@ if __name__ == '__main__':
 
     path_to_gnn_model = ''
     gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth'
-    torch.save(model, f'../Models/GNNs/Models_20_7_Datasets-improved-Gini/Models_20_7_Wordpress-improved-Gini/model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth')
+    torch.save(model, f'../Models/GNNs/model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth')
