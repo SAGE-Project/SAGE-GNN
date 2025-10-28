@@ -17,7 +17,7 @@ This project introduces a unique approach combining Graph Neural Networks (GNNs)
 
 By using these GNN-based predictions as soft constraints in Z3, we enhance search efficiency, making the deployment process both more efficient and cost-effective in many cases.
 
-This repository accompanies the paper *???* submitted to the [Constraints](https://link.springer.com/journal/10601). 
+This repository accompanies the paper *Neuro-Symbolic Constrained Optimization for Cloud Application Deployment via Graph Neural Networks and Satisfiability Modulo Theory* submitted to  [Constraints](https://link.springer.com/journal/10601) journal. 
 
 
 ## Features
