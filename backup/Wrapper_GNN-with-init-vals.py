@@ -43,8 +43,8 @@ class Wrapper_GNN:
         # Wordpress = 5
         # Oryx2 = 10
         # SecureWebContainer = 5
-        assignment_pred = to_assignment_matrix(dgl_graph, dec_graph, pred, 5)
-        assignment_actual = to_assignment_matrix(dgl_graph, dec_graph, edge_label, 5)
+        assignment_pred = to_assignment_matrix(dgl_graph, dec_graph, pred, 10)
+        assignment_actual = to_assignment_matrix(dgl_graph, dec_graph, edge_label, 10)
         matches, diffs = count_matches_and_diffs([element for row in assignment_pred for element in row],
                                                  [element for row in assignment_actual for element in row])
         print(f"{matches} values match; {diffs} don't")

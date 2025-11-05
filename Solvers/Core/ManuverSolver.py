@@ -5,8 +5,8 @@ class ManuverSolver(object):
     def init_problem(self, problem, solver_type,
                      default_offers_encoding=True,
                      sb_option=None,
-                     smt2lib=None, smt2libsol=None, cplexLPPath=None,
-                     use_vm_vector_in_encoding=False, offers_list_filtered=False):
+                     smt2lib=None, smt2libsol=None, cplex=None, cplexSol=None,
+                     use_vm_vector_in_encoding=False, offers_list_filtered=False, mode=None):
 
         self.__constMap = {}
         self.problem = problem
@@ -15,6 +15,8 @@ class ManuverSolver(object):
         self.nrComp = self.problem.nrComp
         self.vm_with_offers = {}
         self.vmIds_for_fixedComponents = set()
+        self.mode = mode
+
         if solver_type == "optimize":
             self.solverTypeOptimize = True  # optimize, debug
         else:
@@ -24,7 +26,8 @@ class ManuverSolver(object):
         self.sb_option = sb_option
         self.smt2lib = smt2lib
         self.smt2libsol = smt2libsol
-        self.cplexLPPath = cplexLPPath
+        self.cplex = cplex
+        self.cplexSol = cplexSol
         self.use_vm_vector_in_encoding = use_vm_vector_in_encoding
         self.offers_list_filtered = offers_list_filtered
         self.default_offers_encoding = default_offers_encoding

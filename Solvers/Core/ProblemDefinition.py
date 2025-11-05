@@ -16,7 +16,7 @@ class ManeuverProblem:
         self.restrictionsList = []  # list of restrictions
         self.IpInfo = {}  # list with other information
         self.applicationName = None
-        self.wpInst = 4
+        self.wpInst = 0
 
         logging.basicConfig()
         
@@ -34,20 +34,20 @@ class ManeuverProblem:
         self.D = numpy.zeros((self.nrComp, self.nrComp), dtype=int) #corelation hraph
 
 
-    # def solveLIP(self, choosing_stategy, solutions_limit):
-    #     """
-    #     Start solving the problem using the chosen solver and available configurations for VM
-    #     :param cpSolver: Solver choosed to solve the problem
-    #     :return:
-    #     """
-    #     self.logger.info("Resolve problem using CP solver")
-    #     from maneuverRecomadEngine.exactsolvers import CP_Solver_GOT
-    #     cpSolver = CP_Solver_GOT_LP.CP_Solver_GOT_LP(choosing_stategy, self)
-    #
-    #     for restriction in self.restrictionsList:
-    #         restriction.generateRestrictions(cpSolver)
-    #
-    #     return cpSolver.run()
+    def solveLIP(self, choosing_stategy, solutions_limit):
+        """
+        Start solving the problem using the chosen solver and available configurations for VM
+        :param cpSolver: Solver choosed to solve the problem
+        :return:
+        """
+        self.logger.info("Resolve problem using CP solver")
+        from Solvers.Core.CP_Solver_GOT import CP_Solver_Got
+        cpSolver = CP_Solver_Got(choosing_stategy, self)
+
+        for restriction in self.restrictionsList:
+            restriction.generateRestrictions(cpSolver)
+
+        return cpSolver.run()
 
     def findPartitionsBasedOnConflictsMatrix(self):# inspired from tarjan algorithm
 

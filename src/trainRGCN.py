@@ -3,10 +3,9 @@ import json
 import dgl
 import torch
 import time
+import random
 
 import numpy as np
-from sympy.assumptions.handlers import test_closed_group
-
 from graph import Node, Graph
 from dgl_graph import DGLGraph, print_dataset
 import torch.nn as nn
@@ -14,6 +13,7 @@ import torch.nn.functional as F
 import dgl.nn as dglnn
 import matplotlib.pyplot as plt
 from focal_loss.focal_loss import FocalLoss
+
 
 def read_jsons(path_to_dir):
     all_json_data = []
@@ -40,10 +40,8 @@ def get_node_features(component, restrictions, max_cpu, max_mem, max_storage, id
     upper_b = 0
     lower_b = 0
     eq_b = 0
-    #print("====")
+
     node_id = component['id']
-    # print(node_id)
-    # print(restrictions)
     for res in restrictions:
         if res["type"] == "FullDeployment" and res["alphaCompId"] == node_id:
             full_deploy = 1
@@ -53,11 +51,37 @@ def get_node_features(component, restrictions, max_cpu, max_mem, max_storage, id
             lower_b = 1
         if res["type"] == "EqualBound" and len(res["compsIdList"]) == 1 and node_id in res["compsIdList"]:
             eq_b = 1
-    #print(full_deploy, upper_b, lower_b, eq_b)
 
     return [id/4, cpu, memory, storage, full_deploy, upper_b, lower_b, eq_b]
 
-def get_component_nodes(json_data):
+def get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage):
+    component_nodes = []
+    for id,component in enumerate(json_data['components']):
+        features = get_node_features(component, restrictions, max_cpu, max_mem, max_storage,id)
+        component_node = Node(component['id'], features, "component")
+        component_nodes.append(component_node)
+    return component_nodes
+
+def get_vm_nodes(json_data, starting_index, max_cpu, max_mem, max_storage, max_price, surrogate_result):
+    vm_nodes = []
+    idx = 0
+    print("???", len(json_data['output']['offers'].keys()))
+    for vm_type in json_data['output']['offers'].keys():
+        vm_specs = json_data['output']['offers'][vm_type]
+
+        vm_features = [
+            vm_specs["cpu"] / max_cpu,
+            vm_specs["memory"] / max_mem,
+            vm_specs["storage"] / max_storage,
+            vm_specs["price"] / max_price
+        ]
+        for i in range(surrogate_result):
+            print("idx", idx)
+            vm_nodes.append(Node(starting_index + idx, vm_features + [(i + 1) / surrogate_result], "vm"))
+            idx = idx + 1
+    return vm_nodes
+
+def get_graph_data(json_data, file_name):
     restrictions = json_data["restrictions"]
     assign = json_data["output"]["assign_matr"]
     # Determine max of each cpu/memory/storage/price for normalization in [0, 1]
@@ -69,88 +93,35 @@ def get_component_nodes(json_data):
         if cpu > max_cpu: max_cpu = cpu
         if memory > max_mem: max_mem = memory
         if storage > max_storage: max_storage = storage
-
-    component_nodes = []
-    for id,component in enumerate(json_data['components']):
-        features = get_node_features(component, restrictions, max_cpu, max_mem, max_storage,id)
-        component_node = Node(component['id'], features, "component")
-        component_nodes.append(component_node)
-    return component_nodes
-
-def get_vm_nodes(json_data, starting_index, surrogate_result):
-    max_cpu, max_mem, max_storage, max_price = 0, 0, 0, 0
-
-    offers = json_data['output']['offers'].values()  # Extract all offers
-
-    # Extract max values correctly
-    for vm_specs in offers:
-        max_cpu = max(max_cpu, vm_specs["cpu"])
-        max_mem = max(max_mem, vm_specs["memory"])
-        max_storage = max(max_storage, vm_specs["storage"])
-        max_price = max(max_price, vm_specs["price"])
-
-    vm_nodes = []
-    idx = 0
-
-    # Normalize and create nodes
-    for vm_specs in json_data['output']['offers'].values():
-        vm_features = [
-            vm_specs["cpu"] / max_cpu if max_cpu else 0,
-            vm_specs["memory"] / max_mem if max_mem else 0,
-            vm_specs["storage"] / max_storage if max_storage else 0,
-            vm_specs["price"] / max_price if max_price else 0,
-        ]
-        for i in range(surrogate_result):
-            #vm_nodes.append(Node(starting_index + idx, vm_features + [(i + 1) / surrogate_result], "vm"))
-            vm_nodes.append(Node(starting_index + idx, vm_features, "vm"))
-            idx += 1
-
-    return vm_nodes
-
-
-def get_graph_data(json_data, file_name):
-    restrictions = json_data["restrictions"]
-    assign = json_data["output"]["assign_matr"]
-    # # Determine max of each cpu/memory/storage/price for normalization in [0, 1]
-    # max_cpu, max_mem, max_storage, max_price = 0, 0, 0, 0
-    # for component in json_data['components']:
-    #     cpu = component["Compute"]["CPU"]
-    #     memory = component["Compute"]["Memory"]
-    #     storage = component["Storage"]["StorageSize"]
-    #     if cpu > max_cpu: max_cpu = cpu
-    #     if memory > max_mem: max_mem = memory
-    #     if storage > max_storage: max_storage = storage
-    # for vm_type in json_data['output']['types_of_VMs']:
-    #     print("---> ", [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type])
-    #     if ([vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type] != []):
-    #         vm_specs = [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type][0]
-    #         cpu = list(vm_specs.values())[0]["cpu"]
-    #         memory = list(vm_specs.values())[0]["memory"]
-    #         storage = list(vm_specs.values())[0]["storage"]
-    #         price = list(vm_specs.values())[0]["price"]
-    #         #print("cpu ",cpu)
-    #         if cpu > max_cpu: max_cpu = cpu
-    #         if memory > max_mem: max_mem = memory
-    #         if storage > max_storage: max_storage = storage
-    #         if price > max_price: max_price = price
+    for vm_type in json_data['output']['types_of_VMs']:
+        #print("---> ", [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type])
+        if ([vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type] != []):
+            vm_specs = [vm for vm in json_data['output']['VMs specs'] if list(vm.values())[0]['id'] == vm_type][0]
+            #print("vm_specs ", vm_specs)
+            cpu = list(vm_specs.values())[0]["cpu"]
+            memory = list(vm_specs.values())[0]["memory"]
+            storage = list(vm_specs.values())[0]["storage"]
+            price = list(vm_specs.values())[0]["price"]
+            #print("cpu ",cpu)
+            if cpu > max_cpu: max_cpu = cpu
+            if memory > max_mem: max_mem = memory
+            if storage > max_storage: max_storage = storage
+            if price > max_price: max_price = price
 
     #surrogate_result = 6 # Secure Web Container
-        #surrogate_result = 5  # Secure Billing Email
-    #surrogate_result = 11  #Oryx2
-    surrogate_result = 8  # Wordpress3
+    # surrogate_result = 5  # Secure Billing Email
+    surrogate_result = 11  #Oryx2
+    #surrogate_result = 8  # Wordpress3
     #surrogate_result = 10  # Wordpress4
-    #surrogate_result = 12  # Wordpress5
-        #surrogate_result = 13  # Wordpress6
-        #surrogate_result = 15  # Wordpress7
-        #surrogate_result = 19  # Wordpress8
-    component_nodes = get_component_nodes(json_data)
-    print("component nodes ", component_nodes)
-
-    vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, surrogate_result)
-    print("vm_nodes ", len(vm_nodes), vm_nodes)
+    # component_nodes represent the nodes with first indexes
+    component_nodes = get_component_nodes(json_data, restrictions, max_cpu, max_mem, max_storage)
+    print("component_nodes ", component_nodes)
+    # after component_nodes the vm_nodes are indexed. The number of vm_nodes is surrogate_result*
+    vm_nodes = get_vm_nodes(json_data, len(component_nodes) + 1, max_cpu, max_mem, max_storage, max_price,
+                            surrogate_result)
+    print("vm_nodes", vm_nodes)
     return Graph(file_name, component_nodes, vm_nodes, restrictions, assign, json_data["output"], surrogate_result)
 
-# for edge prediction
 class HeteroMLPPredictor(nn.Module):
     def __init__(self, in_dims, n_classes):
         super().__init__()
@@ -172,14 +143,13 @@ class HeteroMLPPredictor(nn.Module):
 class Model(nn.Module):
     def __init__(self, in_features, hidden_features, out_features, rel_names):
         super().__init__()
-        self.sage = RGCN(in_features, hidden_features, out_features, rel_names) # node prediction
-        self.pred = HeteroMLPPredictor(out_features, len(rel_names)) # edge prediction
+        self.sage = RGCN(in_features, hidden_features, out_features, rel_names)
+        self.pred = HeteroMLPPredictor(out_features, len(rel_names))
 
     def forward(self, g, x, dec_graph):
         h = self.sage(g, x)
         return self.pred(dec_graph, h)
 
-# for node prediction
 class RGCN(nn.Module):
     def __init__(self, in_feats, hid_feats, out_feats, rel_names):
         super().__init__()
@@ -199,67 +169,20 @@ class RGCN(nn.Module):
 
 def to_assignment_matrix(graph, dec_graph, tensor, components_nr):
     vms_nr = int(len(tensor) / components_nr)
-    #print("tensor ", len(tensor), vms_nr, tensor)
     assign_matrix = [[0 for _ in range(vms_nr)] for _ in range(components_nr)]
-    #print("assign_matrix ", len(assign_matrix), len(assign_matrix[0]))
 
     for dec_ind in range(len(tensor)):
         type = dec_graph.edata[dgl.ETYPE][dec_ind].item()
         orig_index = dec_graph.edata[dgl.EID][dec_ind].item()
         type_edge = graph.etypes[type]
         component = graph.edges(form='uv', order='srcdst', etype=type_edge)[0][orig_index].item()
-        vm =        graph.edges(form='uv', order='srcdst', etype=type_edge)[1][orig_index].item()
+        vm = graph.edges(form='uv', order='srcdst', etype=type_edge)[1][orig_index].item()
         value = tensor[dec_ind].item()
-        print("component ", component, " vm ", vm, "value ", value)
-
         if value == 2:
             assign_matrix[component][vm] = 0
         else:
             assign_matrix[component][vm] = 1
-    ##### for comparison.py only
-    # print("Each row represents a component")
-    # # hardcoding
-    # #surrogate_result = 6 # Secure Web Container
-    # # surrogate_result = 5  # Secure Billing Email
-    # # surrogate_result = 11  #Oryx2
-    # #surrogate_result = 8  # Wordpress3
-    # surrogate_result = 10  # Wordpress4
-    # #surrogate_result = 12  # Wordpress5
-    # # surrogate_result = 13  # Wordpress6
-    # # surrogate_result = 15  # Wordpress7
-    # # surrogate_result = 19  # Wordpress8
-    # # VM types = 7 from training
-    # numb_VM_Types = 40
-    # for i in range(components_nr):
-    #     print(assign_matrix[i], " ")
-    # print("Each matrix is for a component where rows represents a VM and cols types of a VM")
-    # for i in range(components_nr):
-    #     print("component ", i)
-    #     print(np.array(assign_matrix[i]).reshape(surrogate_result, numb_VM_Types))
-    #
-    # assign_matrix = np.array(assign_matrix)
-    #
-    # for i in range(assign_matrix.shape[0]):
-    #     row = assign_matrix[i]
-    #     if np.sum(row) > 1:
-    #         first_one = np.argmax(row)  # global argmax across the row
-    #         row[:] = 0  # zero the whole row
-    #         row[first_one] = 1  # keep only the first 1
-    #
-    # print("AFTER removal of duplicate 1s: Each row represents a component")
-    # for i in range(components_nr):
-    #     print(assign_matrix.tolist()[i], " ")
-    # print("Each matrix is for a component where rows represents a VM and cols types of a VM")
-    # for i in range(components_nr):
-    #     print("component ", i)
-    #     np.set_printoptions(threshold=np.inf)
-    #     print(np.array(assign_matrix[i]).reshape(surrogate_result, numb_VM_Types))
-
-    print("assign_matrix ", assign_matrix)
-
     return assign_matrix
-
-    #return assign_matrix.tolist()
 
 def count_matches_and_diffs(list1, list2):
     # Ensure the lists have the same length
@@ -279,25 +202,23 @@ def count_matches_and_diffs(list1, list2):
 
     return matches, diffs
 
-
 def split_into_batches(arr, batch_size):
     return [arr[i:i + batch_size] for i in range(0, len(arr), batch_size)]
 
-
 if __name__ == '__main__':
     #print("BEFORE DIR READ")
-    data = read_jsons('/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Datasets/DatasetsInitial/DsOryx2_20_7/')
+    data = read_jsons('../Datasets/DsWordpress3')
     #print("AFTER DIR READ")
 
     graphs = []
     index = 0
-    samples = 1000
+    #samples = 15501
+    samples = 50
     for json_graph_data in data[:samples]:
         index = index + 1
         #print(f"DURING Graphs construct {index}")
         filename = json_graph_data['filename']
         graphs.append(get_graph_data(json_graph_data, filename))
-        print("Example of graph data (from dataset files)", get_graph_data(json_graph_data, filename))
 
     dgl_graphs = []
     index = 0
@@ -310,31 +231,41 @@ if __name__ == '__main__':
         # print('\n\nGraph Nodes AND Edges')
         # print(graph)
         dataset = DGLGraph(graph)
-        dgl_graph = dataset[0] # dataset[1], ..., dataset[len(samples)] is the same
-        #print("dgl graph ", dgl_graph)
+        dgl_graph = dataset[0]
         #dgl_graph = dgl_graph.to('cuda')
-        print("Example of dgl_graph")
-        print_dataset(dgl_graph)
-        print("End example of dgl_graph")
+        # print_dataset(dgl_graph)
         dgl_graphs.append(dgl_graph)
 
-    #print("dgl_graphs ", dgl_graphs)
-
     arr = np.array(dgl_graphs)
-    # Calculate the sizes of the three parts
+    # Calculate the sizes of the train, validation, test sets and take random indexes (function shuffle) for train, test, validate
     n = len(arr)
-    size1 = int(0.6 * n)
-    size2 = int(0.2 * n)
+    #print("n=", n)
+    data = list(range(0, n))
+    #print("data before ", data)
+    random.shuffle(data)
+    #print("data after ", data)
+    sizeTrain = int(0.6 * n)
+    sizeValidation = int(0.2 * n)
+    sizeTest = len(data) - sizeValidation - sizeValidation
+    train = []
+    validation = []
+    test = []
 
-    # Split the array into three parts
-    train = arr[:size1].tolist()
-    validation = arr[size1:size1 + size2].tolist()
-    test = arr[size1 + size2:].tolist()
+    # Split the array into three parts randomly
+    for i in range(sizeTrain):
+        train.append(arr[data[i]])
+    for i in range(sizeTrain+sizeValidation):
+        validation.append(arr[data[i]])
+    for i in range(sizeTrain+sizeValidation, len(data)):
+        test.append(arr[data[i]])
 
-    model = Model(8, 10, 5, ['binding', 'linked', 'unlinked'])
+    # train = arr[:size1].tolist()
+    # validation = arr[size1:size1 + size2].tolist()
+    # test = arr[size1 + size2:].tolist()
 
-    print("model = ", model)
-
+    # 8 features of component nodes. We also have VM nodes! ???
+    # 5 components ???
+    model = Model(8, 10, 5, ['conflict', 'linked', 'unlinked'])
     #model = model.to('cuda')
     opt = torch.optim.Adam(model.parameters())
     loss_list = []
@@ -345,8 +276,7 @@ if __name__ == '__main__':
 
     class_weights = torch.FloatTensor([0.0, 0.9, 0.1])
     #class_weights = class_weights.to('cuda')
-    loss_func = FocalLoss(weights=class_weights, gamma=0.7)
-    #loss_func = FocalLoss(weights=class_weights, gamma=0) #when gamma=0 we have cross entropy
+    loss_func = FocalLoss(weights=class_weights, gamma=0.7) # if gamma=0 then cross entropy
     m = torch.nn.Softmax(dim=-1)
     startime = time.time()
     epochs = 100
@@ -361,7 +291,7 @@ if __name__ == '__main__':
         y_pred = []
         y_true = []
 
-        batch_size = 128
+        batch_size = 50
         batched_training = split_into_batches(train, batch_size)
         for train_graphs in batched_training:
             loss_list_batch = []
@@ -369,13 +299,10 @@ if __name__ == '__main__':
             total_labels = None
 
             for train_graph in train_graphs:
-                #print("train_graph", train_graph)
                 #train_graph = train_graph.to('cuda')
                 dec_graph = train_graph['component', :, 'vm']
-                #print("dec_graph ", dec_graph)
                 #dec_graph = dec_graph.to('cuda')
                 edge_label = dec_graph.edata[dgl.ETYPE]
-                #print("edge label train", edge_label)
                 #edge_label = edge_label.to('cuda')
                 comp_feats = train_graph.nodes['component'].data['feat']
                 #comp_feats = comp_feats.to('cuda')
@@ -383,30 +310,17 @@ if __name__ == '__main__':
                 #vm_feats = vm_feats.to('cuda')
 
                 node_features = {'component': comp_feats, 'vm': vm_feats}
-                #print("node_features train ", node_features)
 
-                # print("train graph ", train_graph)
-                # print("node features ", node_features)
-                # print("dec graph ", dec_graph)
-                # the call "model(train_graph, ..." looks weird but this is how is on DGL library: https://www.dgl.ai/dgl_docs/guide/training-edge.html
-                # 3 args instead of 2 in DGL website
                 logits = model(train_graph, node_features, dec_graph)
-                print("logits train after model ", len(logits), len(logits[0]), logits)
                 #logits = logits.to('cuda')
                 if total_logits == None:
                     total_logits = logits
-                    #print("none total_logits", total_logits)
                 else:
                     total_logits = torch.cat((total_logits, logits))
-                    #print("not none total_logits", total_logits)
                 if total_labels == None:
                     total_labels = edge_label
-                    #print("none total_labels", total_labels)
                 else:
                     total_labels = torch.cat((total_labels, edge_label))
-                    #print("not none total_labels", total_labels)
-
-                print("logits.argmax(dim=-1) ", logits.argmax(dim=-1)) # Select the most probable class (binding, linked, unlinked) for each prediction.
                 y_pred.append(logits.argmax(dim=-1))
                 y_true.append(edge_label)
 
@@ -444,7 +358,6 @@ if __name__ == '__main__':
             dec_graph = validation_graph['component', :, 'vm']
 
             edge_label = dec_graph.edata[dgl.ETYPE]
-            #print("edge label validation", edge_label)
             comp_feats = validation_graph.nodes['component'].data['feat']
             vm_feats = validation_graph.nodes['vm'].data['feat']
             node_features = {'component': comp_feats, 'vm': vm_feats}
@@ -470,10 +383,9 @@ if __name__ == '__main__':
         #print("Validation accuracy:", accuracy)
 
     stoptime = time.time()
-    #print("training time ", stoptime - startime)
+    print("training time ", stoptime - startime)
     #print(loss_list)
-    #print("loss_list_valid ", loss_list_valid)
-
+    #print(loss_list_valid)
 
     plt.plot(range(epochs), loss_list, label='Loss Train')
     plt.plot(range(epochs), loss_list_valid, label='Loss Valid')
@@ -481,7 +393,7 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/loss_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/Wordpress3/loss_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     # plt.plot(range(epochs), loss_list, label='Loss')
@@ -491,7 +403,7 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.legend()
     #plt.show()
-    plt.savefig(f'../plots/acc_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.png')
+    plt.savefig(f'../plots/Wordpress3/acc_RGCN_{samples}_samples_{epochs}_epochs.png')
     plt.close()
 
     ###########################################################################################################################################################
@@ -504,43 +416,26 @@ if __name__ == '__main__':
     # set the model to evaluation mode
     model.eval()
 
-    #print("test ", test)
-
     # loop over the test graphs and compute the predictions and true labels
     #print("len test ", len(test))
     matchesCount = 0
     diffsCount = 0
     for test_graph in test:
         dec_graph = test_graph['component', :, 'vm']
-        #print("dec graph", dec_graph)
+        #print(dec_graph)
 
         edge_label = dec_graph.edata[dgl.ETYPE]
-        #print("edge label test", edge_label)
         comp_feats = test_graph.nodes['component'].data['feat']
         vm_feats = test_graph.nodes['vm'].data['feat']
         node_features = {'component': comp_feats, 'vm': vm_feats}
-        #print("node features ", node_features)
         with torch.no_grad():
             logits = model(test_graph, node_features, dec_graph)
-        pred = logits.argmax(dim=-1) # return to the class
-
-        #print("logits testing", len(logits), logits.shape, logits)
-        #print("pred testing", len(pred), pred)
-
+        pred = logits.argmax(dim=-1)
         y_pred.append(pred)
-        # last argument is the # of components of the application, Secure Web Container=5
-        # last argument is the # of components of the application, Secure Billing Email=5
-        # last argument is the # of components of the application, Oryx2=10
+        #last argument is the # of components of the application, Oryx2=10
         # last argument is the # of components of the application, Wordpress3=5
-        print("=====================================")
-        print(test_graph)
-        print(dec_graph)
-        print("pred", pred)
-        print("=====================================")
-        assingnament_pred   = to_assignment_matrix(test_graph, dec_graph, pred, 5)
-        print("assingnament_pred", assingnament_pred)
-        assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 5)
-        print("assingnament_actual", assingnament_actual)
+        assingnament_pred = to_assignment_matrix(test_graph, dec_graph, pred, 10)
+        assingnament_actual = to_assignment_matrix(test_graph, dec_graph, edge_label, 10)
         matches, diffs = count_matches_and_diffs([element for row in assingnament_pred for element in row],
                                                  [element for row in assingnament_actual for element in row])
         matchesCount += matches
@@ -563,5 +458,5 @@ if __name__ == '__main__':
     print("Testing accuracy:", accuracy)
 
     path_to_gnn_model = ''
-    gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth'
-    torch.save(model, f'../Models/GNNs/model_RGCN_{samples}_samples_{epochs}_epochs_{batch_size}_batchsize.pth')
+    gnn_model = 'model_RGCN_{samples}_samples_{epochs}_epochs.pth'
+    torch.save(model, f'../Models/GNNs/Wordpress3/model_RGCN_{samples}_samples_{epochs}_epochs.pth')

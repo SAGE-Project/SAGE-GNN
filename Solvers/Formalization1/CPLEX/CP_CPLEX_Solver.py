@@ -70,7 +70,7 @@ class CPlex_Solver_Parent(ManuverSolver):
         objective = self.model.sum(self.PriceProv[j] for j in range(self.nr_vms))
         self.model.minimize(objective)
         #       self.model.prettyprint("out_oryx2")
-        self.model.export_as_lp(self.cplexLPPath)
+        self.model.export_as_lp(self.cplex)
         #       self.model.export_as_mps("nou")
 
         vmPrice = []
@@ -118,9 +118,6 @@ class CPlex_Solver_Parent(ManuverSolver):
         return xx.get_objective_value(), vmPrice, stoptime - starttime, a_mat, vmType
         # return None, None, stoptime - starttime, None, None
 
-
-
-
     def RestrictionLex(self, vm_id, additional_constraints=[]):
         """
         Lexicografic order between two consecutive columns
@@ -152,8 +149,6 @@ class CPlex_Solver_Parent(ManuverSolver):
             else:
                 self.model.add_constraint(ct=self.a[i, vm_id] >= self.a[i, vm_id + 1])
 
-
-
     def RestrictionPrice(self, vm_id, additional_constraints=[]):
         """
         Lexicografic order between two consecutive columns
@@ -172,7 +167,6 @@ class CPlex_Solver_Parent(ManuverSolver):
             self.model.add_indicator(var, self.PriceProv[vm_id] >= self.PriceProv[vm_id + 1])
 
         return self.PriceProv[vm_id] == self.PriceProv[vm_id + 1]
-
 
     def RestrictionFixComponentOnVM(self, comp_id, vm_id, value=1):
         """
@@ -206,7 +200,6 @@ class CPlex_Solver_Parent(ManuverSolver):
 
         return sum([self.a[i, vm_id] for i in range(self.nr_comps)]) == \
                sum([self.a[i, vm_id + 1] for i in range(self.nr_comps)])
-
 
     def RestrictionConflict(self, alphaCompId, conflictCompsIdList):
         """
@@ -384,7 +377,6 @@ class CPlex_Solver_Parent(ManuverSolver):
                                    name="c_or_beta")
 
         self.model.add_constraint(ct=self.model.sum([alphaSum, betaSum]) == 1, ctname="c_or")
-
 
     def RestrictionLexBinaryNumber(self):
         """

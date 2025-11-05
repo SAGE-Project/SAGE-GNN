@@ -1,10 +1,7 @@
-import pprint
-
+from torch.ao.quantization import per_channel_weight_observer_range_neg_127_to_127
 from z3 import *
 from Solvers.Core.ManuverSolver import ManuverSolver
 import time
-import uuid
-
 
 class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
 
@@ -14,14 +11,13 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         :return: None
         """
         if self.solverTypeOptimize:
+            #TODO: set_param does not take into account the mode=init or not and
+            # has to be commented manually for wrapper_z3.solve(application, offers_do) respectivelly for print(wrapper_z3.solve(application, offers_do, matrix_init=matrix, VMSpecs_init=VMSpecs, mode="init"))
             set_option(verbose=10)
-            self.solver = Optimize()
-            #self.solver.set(priority='pareto')
-            t0 = time.perf_counter()
             set_param("opt.elim_01", False)  # perhaps not necessary, but keeps it simpler wrt initialization
             set_param("opt.dump_models", True)  # dump best current solution so far
             set_param("smt.elim_term_ite", False)  # avoids creating new variables that can obscure initial value setting.
-
+            self.solver = Optimize()
         else:
             self.solver = Solver()
             self.solver.set(unsat_core=True)
@@ -413,9 +409,6 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         if fileName is None: return
         with open(fileName, 'w+') as fo:
             fo.write(self.solver.sexpr())
-            fo.write('(get-model)\n')
-            fo.write('(get-objectives)\n')
-            fo.write('(exit)')
         fo.close()
 
     def createSMT2LIBFileSolution(self, fileName, status, model):
@@ -440,75 +433,158 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
 
     def run(self):
         """
-        Invokes the solving of the problem (solution and additional effect like creation of special files)
-        :param smt2lib: string indicating a file name storing the SMT2LIB encoding of the problem
-        :param smt2libsol: string indicating a file name storing the solution of the problem together with a model (if applicable)
-        :return:
+        Invokes the solving of the problem, generates the SMT-LIB problem file,
+        and writes the result (SAT/UNSAT/UNKNOWN), model, and statistics
+        into the solution file.
         """
 
+        # If optimization mode is active
         if self.solverTypeOptimize:
             opt = sum(self.PriceProv)
-            # self.solver.set(priority='lex')
-            #self.solver.set(priority='pareto')
-            #self.solver.set(priority='box') #comportament ciudat
-            min = self.solver.minimize(opt)
+            min_obj = self.solver.minimize(opt)
+
+        # 1️⃣ Save the SMT problem encoding before solving
         self.createSMT2LIBFile(self.smt2lib)
 
+        # 2️⃣ Run the solver and measure runtime
         self.get_current_time()
-
-        startime = time.time()
-
+        start_time = time.time()
         status = self.solver.check()
-        stoptime = time.time()
 
-        res_stat = self.solver.statistics()
-        print(res_stat)
-        with open(f"../Output/Stats-Z3/" + str(uuid.uuid4()), 'w+') as fstat:
-            fstat.write(f"{res_stat}")
-        fstat.close()
+        stop_time = time.time()
 
+        # 3️⃣ Handle UNSAT cores (for non-optimize mode)
         if not self.solverTypeOptimize:
-            c = self.solver.unsat_core()
-            self.problem.logger.debug("unsat_constraints= {}".format(c))
-            print("unsat_constraints= {}".format(c))
-            # for cc in c:
-            #     self.problem.logger.debug(
-            #         "Constraint label: {} constraint description {}".format(str(cc), self.__constMap[cc]))
+            unsat_core = self.solver.unsat_core()
+            self.problem.logger.debug(f"unsat_constraints= {unsat_core}")
+            if len(unsat_core) > 0:
+                print(f"unsat_constraints= {unsat_core}")
 
-        self.problem.logger.info("Z3 status: {}".format(status))
+        # 4️⃣ Log and print status
+        self.problem.logger.info(f"Z3 status: {status}")
+        print(f"Z3 status: {status}")
 
+        # 5️⃣ Collect model data if SAT
+        model_dict = {}
         if status == sat:
             model = self.solver.model()
-            a_mat = []
-            for i in range(self.nrComp):
-                l = []
-                for k in range(self.nrVM):
-                    l.append(model[self.a[i * self.nrVM + k]])
-                a_mat.append(l)
-            #print("Price for each machine")
-            vms_price = []
-            for k in range(self.nrVM):
-                vms_price.append(int(self.convert_price(model[self.PriceProv[k]]) * 1000))
-            #print(vms_price)
-            #print("Type for each machine")
-            vms_type = []
-            for k in range(self.nrVM):
-                vms_type.append(model[self.vmType[k]])
-            #print(vms_type)
+            for d in model.decls():
+                model_dict[str(d)] = str(model[d])
 
-            pprint.pprint(a_mat)
-            print(vms_type)
-        else:
-            print("UNSAT")
+        # 6️⃣ Write result + model + statistics into one SMT2LIB solution file
+        self.createSMT2LIBFileSolution(
+            self.smt2libsol,
+            str(status).upper(),
+            model_dict,
+            solver=self.solver
+        )
+
+        # 7️⃣ Post-process results depending on optimization mode
         if self.solverTypeOptimize:
             if status == sat:
-                #print("a_mat", a_mat)
-                # create corresponding SMT-LIB file
-                self.createSMT2LIBFileSolution(self.smt2libsol, status, model)
-                # do not return min.value() since the type is not comparable with -1 in the exposeRE
-                return self.convert_price(min.value()), vms_price, stoptime - startime, a_mat, vms_type
+                # Build assignment matrix
+                a_mat = []
+                for i in range(self.nrComp):
+                    l = []
+                    for k in range(self.nrVM):
+                        l.append(model[self.a[i * self.nrVM + k]])
+                    a_mat.append(l)
+
+                # VM prices
+                vms_price = [
+                    int(self.convert_price(model[self.PriceProv[k]]) * 1000)
+                    for k in range(self.nrVM)
+                ]
+
+                # VM types
+                vms_type = [model[self.vmType[k]] for k in range(self.nrVM)]
+
+                # Return optimization data
+                return (
+                    self.convert_price(min_obj.value()),
+                    vms_price,
+                    stop_time - start_time,
+                    a_mat,
+                    vms_type,
+                )
             else:
-                # unsat
+                # UNSAT in optimization case
                 return -1, None, None, None, None
         else:
-            return None, None, stoptime - startime
+            # Non-optimization case: just return timing
+            return None, None, stop_time - start_time
+
+    def createSMT2LIBFileSolution(self, fileName, status, model, solver=None):
+        """
+        Writes the solver result, model, objective values, and stats into one SMT-LIB-like file.
+        """
+        if fileName is None:
+            return
+
+        with open(fileName, 'w+', encoding='utf-8') as f:
+            f.write("; =========================================\n")
+            f.write("; Z3 Solver Result\n")
+            f.write("; =========================================\n\n")
+
+            f.write(f"; STATUS: {status}\n\n")
+            f.write("(set-logic QF_LIA)\n\n")
+
+            if status == "SAT":
+                # 1) Model
+                f.write("(model\n")
+                for k, v in model.items():
+                    f.write(f"  (define-fun {k} () Int {v})\n")
+                f.write(")\n\n")
+
+                # 2) Objectives (only if Optimize was used)
+                if solver is not None and isinstance(solver, Optimize):
+                    # Ensure a model exists for evaluation (should, since status == SAT)
+                    try:
+                        m = solver.model()
+                    except Exception:
+                        m = None
+
+                    objs = list(solver.objectives())
+                    if objs:
+                        f.write("; Optimized objective values\n")
+                        for i, obj in enumerate(objs, 1):
+                            val = None
+                            # Prefer OptimizeObjective.value() where available
+                            try:
+                                val = obj.value()
+                            except Exception:
+                                pass
+                            # Fallback: try evaluating as an expression on the model
+                            if val is None and m is not None:
+                                try:
+                                    val = m.eval(obj, model_completion=True)
+                                except Exception:
+                                    val = None
+                            if val is not None:
+                                try:
+                                    sort_name = val.sort().name()
+                                except Exception:
+                                    sort_name = "Int"  # safe default
+                                f.write(f"(define-fun objective{i} () {sort_name} {val})\n")
+                            else:
+                                f.write(f"; objective{i} value unavailable\n")
+                        f.write("\n")
+            else:
+                f.write(f"; No model available ({status})\n\n")
+
+            # Statistics (similar to -st)
+            if solver is not None:
+                try:
+                    f.write("; =========================================\n")
+                    f.write("; Z3 Statistics (-st equivalent)\n")
+                    f.write("; =========================================\n\n")
+                    stats = solver.statistics()
+                    for k in stats.keys():
+                        f.write(f"{k}: {stats.get_key_value(k)}\n")
+                except Exception:
+                    pass
+
+            f.write("\n; End of SMT2LIB result file\n")
+
+
+
