@@ -1,0 +1,161 @@
+sat
+(
+  (define-fun ProcProv6 () Int
+    4)
+  (define-fun C3_VM5 () Int
+    1)
+  (define-fun MemProv5 () Int
+    7000)
+  (define-fun C5_VM4 () Int
+    1)
+  (define-fun C4_VM5 () Int
+    0)
+  (define-fun C5_VM5 () Int
+    1)
+  (define-fun C5_VM1 () Int
+    0)
+  (define-fun StorageProv5 () Int
+    4000)
+  (define-fun PriceProv4 () Int
+    252)
+  (define-fun MemProv1 () Int
+    7500)
+  (define-fun C1_VM4 () Int
+    0)
+  (define-fun MemProv3 () Int
+    30001)
+  (define-fun ProcProv2 () Int
+    8)
+  (define-fun MemProv4 () Int
+    7500)
+  (define-fun VM5Type () Int
+    21)
+  (define-fun VM1Type () Int
+    26)
+  (define-fun C2_VM5 () Int
+    0)
+  (define-fun VM6Type () Int
+    26)
+  (define-fun C4_VM3 () Int
+    0)
+  (define-fun StorageProv2 () Int
+    2000)
+  (define-fun StorageProv1 () Int
+    2000)
+  (define-fun StorageProv6 () Int
+    2000)
+  (define-fun C3_VM1 () Int
+    0)
+  (define-fun ProcProv3 () Int
+    9)
+  (define-fun C3_VM6 () Int
+    0)
+  (define-fun VM3Type () Int
+    0)
+  (define-fun C3_VM2 () Int
+    0)
+  (define-fun C4_VM4 () Int
+    0)
+  (define-fun MemProv2 () Int
+    68400)
+  (define-fun ProcProv4 () Int
+    4)
+  (define-fun C1_VM2 () Int
+    0)
+  (define-fun PriceProv3 () Int
+    0)
+  (define-fun C5_VM6 () Int
+    1)
+  (define-fun C1_VM6 () Int
+    0)
+  (define-fun StorageProv4 () Int
+    2000)
+  (define-fun C5_VM2 () Int
+    0)
+  (define-fun C3_VM3 () Int
+    0)
+  (define-fun C1_VM5 () Int
+    0)
+  (define-fun PriceProv1 () Int
+    252)
+  (define-fun StorageProv3 () Int
+    2001)
+  (define-fun VM4Type () Int
+    27)
+  (define-fun C4_VM2 () Int
+    1)
+  (define-fun PriceProv5 () Int
+    632)
+  (define-fun MemProv6 () Int
+    7500)
+  (define-fun C4_VM6 () Int
+    0)
+  (define-fun C2_VM2 () Int
+    0)
+  (define-fun C2_VM3 () Int
+    0)
+  (define-fun PriceProv6 () Int
+    252)
+  (define-fun C5_VM3 () Int
+    0)
+  (define-fun C4_VM1 () Int
+    0)
+  (define-fun C2_VM6 () Int
+    1)
+  (define-fun C2_VM4 () Int
+    1)
+  (define-fun C1_VM3 () Int
+    0)
+  (define-fun VM2Type () Int
+    22)
+  (define-fun ProcProv1 () Int
+    4)
+  (define-fun C3_VM4 () Int
+    0)
+  (define-fun C2_VM1 () Int
+    0)
+  (define-fun ProcProv5 () Int
+    8)
+  (define-fun PriceProv2 () Int
+    1288)
+  (define-fun C1_VM1 () Int
+    1)
+)
+(objectives
+ ((+ 0 PriceProv1 PriceProv2 PriceProv3 PriceProv4 PriceProv5 PriceProv6) 2676)
+)
+(:added-eqs                   223762
+ :arith-eq-adapter            12896
+ :arith-bound-propagations-lp 243149
+ :arith-conflicts             347
+ :arith-diseq                 383171
+ :arith-fixed-eqs             3436
+ :arith-lower                 394857
+ :arith-make-feasible         31136
+ :arith-max-columns           147
+ :arith-max-rows              20
+ :arith-upper                 423755
+ :binary-propagations         1388060
+ :conflicts                   5548
+ :decisions                   58242
+ :del-clause                  12238
+ :final-checks                117
+ :max-memory                  45.08
+ :memory                      44.88
+ :minimized-lits              84049
+ :mk-bool-var                 27577
+ :mk-clause                   13794
+ :mk-clause-binary            4383
+ :num-allocs                  112976322
+ :num-checks                  91
+ :pb-conflicts                1338
+ :pb-predicates               474
+ :pb-propagations             8708
+ :pb-resolves                 1332
+ :propagations                2383937
+ :restarts                    44
+ :rlimit-count                12968616
+ :solve-eqs-elim-vars         1
+ :solve-eqs-steps             10
+ :time                        0.67
+ :total-time                  0.68)

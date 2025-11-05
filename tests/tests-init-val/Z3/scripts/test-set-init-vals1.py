@@ -1,164 +1,157 @@
-#!/usr/bin/env python3
-"""
-Structured Z3 Optimize script wrapping the SMT-LIB model in
-'WordPress3_b703e050-a7ae-483d-96ab-7a3b7241f02e'.
-"""
-
 from z3 import *
-from typing import List, Sequence, Dict
 import time
+import numpy as np
 
-# -----------------------------------------------------------------------------
-# Configuration
-# -----------------------------------------------------------------------------
-SMT_FILE = "WordPress3_b703e050-a7ae-483d-96ab-7a3b7241f02e"
-VERBOSE  = True
-
-
-# -----------------------------------------------------------------------------
-# Initialize Optimize and verbosity
-# -----------------------------------------------------------------------------
-if VERBOSE:
-    set_option(verbose=10)
-    # t0 = time.perf_counter()
-    # set_param("opt.elim_01", False)  # perhaps not necessary, but keeps it simpler wrt initialization
-    # set_param("opt.dump_models", True)  # dump best current solution so far
-    # set_param("smt.elim_term_ite", False)  # avoids creating new variables that can obscure initial value setting.
-
+set_option(verbose=10)
+set_param("opt.elim_01", False)            # perhaps not necessary, but keeps it simpler wrt initialization
+set_param("opt.dump_models", True)  # dump best current solution so far
+set_param("smt.elim_term_ite", False)  # avoids creating new variables that can obscure initial value setting.
 opt = Optimize()
+# Constants
+NUM_COMPONENTS = 16
+NUM_VMS = 19
 
-# -----------------------------------------------------------------------------
-# Parse SMT-LIB file (returns list of asserted formulas).
-# -----------------------------------------------------------------------------
-formulas = parse_smt2_file(SMT_FILE)
+TIMEOUT = 1800  # 30 minutes
 
-# Add all parsed assertions to the optimizer
-opt.add(formulas)
+# Fixed component requirements
+comp_cpu =     [4, 2, 6, 3, 6, 3, 3, 4, 5, 4, 6, 1, 1, 5, 5, 5]
+comp_ram =     [9, 31, 20, 11, 13, 27, 6, 22, 19, 15, 26, 19, 19, 15, 16, 20]
+comp_storage = [93, 144, 98, 149, 41, 188, 79, 154, 78, 119, 198, 111, 75, 112, 149, 31]
 
-# -----------------------------------------------------------------------------
-# Helper to fetch an Int variable by *exact* name (declared in the file)
-# -----------------------------------------------------------------------------
-def V(name: str) -> IntNumRef:
-    return Int(name)
+# Fixed hardware specifications for each VM
+vm_cpu =     [10, 8, 12, 12, 19, 12, 15, 13, 13, 13, 11, 11, 5, 18, 11, 10, 5, 9, 10]
+vm_ram =     [93, 33, 75, 52, 73, 123, 97, 102, 93, 64, 46, 79, 62, 47, 22, 111, 55, 23, 119]
+vm_storage = [811, 824, 687, 470, 281, 588, 499, 680, 556, 262, 937, 356, 421, 541, 287, 650, 316, 385, 265]
+vm_cost =    [30, 16, 25, 26, 13, 19, 26, 20, 28, 30, 28, 25, 27, 15, 10, 10, 21, 22, 24]
 
-NUM_COMPONENTS = 5
-NUM_VMS     = 8
-
-# variables C{c+1}_VM{v+1}
-ComponentsVMs: List[List[IntNumRef]] = [
-    [V(f"C{c}_VM{v}") for v in range(1, NUM_VMS + 1)]
-    for c in range(1, NUM_COMPONENTS + 1)
+initial_assign = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-VMType      : List[IntNumRef] = [V(f"VM{i}Type")      for i in range(1, NUM_VMS + 1)]
-PriceProv   : List[IntNumRef] = [V(f"PriceProv{i}")   for i in range(1, NUM_VMS + 1)]
-StorageProv : List[IntNumRef] = [V(f"StorageProv{i}") for i in range(1, NUM_VMS + 1)]
-MemProv     : List[IntNumRef] = [V(f"MemProv{i}")     for i in range(1, NUM_VMS + 1)]
-ProcProv    : List[IntNumRef] = [V(f"ProcProv{i}")    for i in range(1, NUM_VMS + 1)]
+## Build Z3 model
+x = [[Int(f"x_{i}_{j}") for j in range(NUM_VMS)] for i in range(NUM_COMPONENTS)]
+y = [Int(f"y_{j}") for j in range(NUM_VMS)]
 
-# ---------------------------------------------------------------------------
-# Initial value hints for per-VM provisioning vectors
-# Index i corresponds to VM (i+1)
-# ---------------------------------------------------------------------------
-price = [210, 210, 116, 116, 116, 116, 116, 210]
-storage = [2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000]
-mem = [7500, 7500, 3750, 3750, 3750, 3750, 3750, 7500]
-proc = [4, 4, 2, 2, 2, 2, 2, 4]
+# Constraints
+for i in range(NUM_COMPONENTS):
+    for j in range(NUM_VMS):
+        opt.add(x[i][j] >= 0, x[i][j] <= 1)
+for j in range(NUM_VMS):
+    opt.add(y[j] >= 0, y[j] <= 1)
+for i in range(NUM_COMPONENTS):
+    opt.add(Sum(x[i]) == 1)
+for j in range(NUM_VMS):
+    for i in range(NUM_COMPONENTS):
+        opt.add(y[j] >= x[i][j])
+    opt.add(Sum([x[i][j] * comp_cpu[i] for i in range(NUM_COMPONENTS)]) <= vm_cpu[j] * y[j])
+    opt.add(Sum([x[i][j] * comp_ram[i] for i in range(NUM_COMPONENTS)]) <= vm_ram[j] * y[j])
+    opt.add(Sum([x[i][j] * comp_storage[i] for i in range(NUM_COMPONENTS)]) <= vm_storage[j] * y[j])
 
-for i, val in enumerate(price):
-    opt.set_initial_value(PriceProv[i], val)
-for i, val in enumerate(storage):
-    opt.set_initial_value(StorageProv[i], val)
-for i, val in enumerate(mem):
-    opt.set_initial_value(MemProv[i], val)
-for i, val in enumerate(proc):
-    opt.set_initial_value(ProcProv[i], val)
+total_cost = Sum([y[j] * vm_cost[j] for j in range(NUM_VMS)])
+opt.minimize(total_cost)
 
-objective = opt.minimize(Sum(PriceProv))
-
-# -----------------------------------------------------------------------------
-# Initial value hints for ComponentsVMs matrix example
-# -----------------------------------------------------------------------------
-components_VM_example = [
-    [0, 0, 1, 1, 0, 1, 0, 0],
-    [0, 0, 0, 0, 1, 0, 1, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 1],
-]
-
-for c_idx, row in enumerate(components_VM_example):
-    for v_idx, val in enumerate(row):
-        opt.set_initial_value(ComponentsVMs[c_idx][v_idx], val)
-
-
-
-# -----------------------------------------------------------------------------
-# Solve
-# -----------------------------------------------------------------------------
-t0 = time.perf_counter()
+start_time = time.time()
+opt.set("timeout", TIMEOUT * 1000)
 result = opt.check()
-t1 = time.perf_counter()
+elapsed = time.time() - start_time
 
-solve_wall = t1 - t0
-print("Result:", result)
-print(f"Optimize.check() wall time: {solve_wall:.6f} s")
+# Set initial values as hints to guide the solver
+for i in range(NUM_COMPONENTS):
+    for j in range(NUM_VMS):
+        print(x[i][j], "=", initial_assign[i][j])
+        opt.set_initial_value(x[i][j], initial_assign[i][j])
 
-if result not in (sat, unknown):
-    print("No model available (unsat).")
-    exit(0)
+vm_cpu     = [Int(f"vm_cpu_{j}") for j in range(NUM_VMS)]
+vm_ram     = [Int(f"vm_ram_{j}") for j in range(NUM_VMS)]
+vm_storage = [Int(f"vm_storage_{j}") for j in range(NUM_VMS)]
+vm_cost    = [Int(f"vm_cost_{j}") for j in range(NUM_VMS)]
 
-model = opt.model()
-print("\nObjective (sum PriceProv):", model.eval(Sum(PriceProv), model_completion=True))
+# # VM 5; 19, 73, 281, 13
+opt.set_initial_value(vm_cpu[4], 19)
+opt.set_initial_value(vm_ram[4], 73)
+opt.set_initial_value(vm_storage[4], 281)
+opt.set_initial_value(vm_cost[4], 13)
+opt.set_initial_value(y[4], 1)
 
+# # VM 6; 12, 123, 588, 19
+opt.set_initial_value(vm_cpu[5], 12)
+opt.set_initial_value(vm_ram[5], 123)
+opt.set_initial_value(vm_storage[5], 588)
+opt.set_initial_value(vm_cost[5], 19)
+opt.set_initial_value(y[5], 1)
+#
+# # VM 14; 18, 47, 541, 15
+opt.set_initial_value(vm_cpu[13], 18)
+opt.set_initial_value(vm_ram[13], 47)
+opt.set_initial_value(vm_storage[13], 541)
+opt.set_initial_value(vm_cost[13], 15)
+opt.set_initial_value(y[13], 1)
+#
+# #VM 15; 11, 22, 287, 10
+opt.set_initial_value(vm_cpu[14], 11)
+opt.set_initial_value(vm_ram[14], 22)
+opt.set_initial_value(vm_storage[14], 287)
+opt.set_initial_value(vm_cost[14], 10)
+opt.set_initial_value(y[14], 1)
+#
+# #VM16; 10, 111, 650, 10
+opt.set_initial_value(vm_cpu[15], 10)
+opt.set_initial_value(vm_ram[15], 111)
+opt.set_initial_value(vm_storage[15], 650)
+opt.set_initial_value(vm_cost[15], 10)
+opt.set_initial_value(y[15], 1)
 
-# -----------------------------------------------------------------------------
-# Helper utilities for extracting model data
-# -----------------------------------------------------------------------------
-def mval(x):
-    """Return Python int (or None) for model value x."""
-    if x is None:
-        return None
-    xv = model.eval(x, model_completion=True)
-    if isinstance(xv, IntNumRef):
-        try:
-            return int(str(xv))
-        except ValueError:
-            return None
-    return xv
+print("set-init-values")
+# Solve and time
+start_time = time.time()
+result = opt.check()
+elapsed = time.time() - start_time
 
-def values(seq: Sequence) -> List[int]:
-    return [mval(s) for s in seq]
+print(f"\nZ3 check() result: {result}")
+print(f"⏱️ Time taken: {elapsed:.2f} seconds")
 
-def summarize_clients():
-    print("\nComponent ↦ VM assignment matrix (C{c}_VM{v}):")
-    for c_idx, row in enumerate(ComponentsVMs, start=1):
-        row_vals = values(row)
-        print(f"  C{c_idx}: {row_vals}")
-
-def summarize_resources():
-    print("\nResource Provisioning:")
-    print("  PriceProv   :", values(PriceProv))
-    print("  StorageProv :", values(StorageProv))
-    print("  MemProv     :", values(MemProv))
-    print("  ProcProv    :", values(ProcProv))
-    print("  VMType      :", values(VMType))
-
-
-# -----------------------------------------------------------------------------
-# Pretty-print selected model information
-# -----------------------------------------------------------------------------
+# Output
 if result == sat:
-    summarize_clients()
-    summarize_resources()
+    model = opt.model()
+    assignment_matrix = np.zeros((NUM_COMPONENTS, NUM_VMS), dtype=int)
 
-    # (Optional) build a dictionary for programmatic downstream use
-    model_dict = {d.name(): mval(d()) for d in model.decls()}
+    for i in range(NUM_COMPONENTS):
+        for j in range(NUM_VMS):
+            if model.eval(x[i][j]).as_long() == 1:
+                assignment_matrix[i][j] = 1
 
-    # Example: print first few entries
-    sample_items = list(model_dict.items())[:10]
-    print("\nSample of model_dict entries:", sample_items)
+    # Print assignment matrix
+    print("\n📋 Component-to-VM assignment matrix:")
+    for row in assignment_matrix:
+        print(" ".join(map(str, row)))
 
-elif result == unknown:
-    print("Status unknown; reason:", opt.reason_unknown())
+    print(f"\n💰 Total cost of active VMs: {model.eval(total_cost)}")
+
+    # Print specs only for used VMs
+    print("\n🖥️ Used VM Hardware Specifications:")
+    print(" VM | CPU | RAM | Storage | Cost")
+    print("-" * 34)
+    for j in range(NUM_VMS):
+        if model.eval(y[j]).as_long() == 1:
+            print(f"{j:>3} | {model.eval(vm_cpu[j], model_completion=True).as_long():>3} | "
+                  f"{model.eval(vm_ram[j], model_completion=True).as_long():>4} | "
+                  f"{model.eval(vm_storage[j], model_completion=True).as_long():>7} | "
+                  f"{model.eval(vm_cost[j], model_completion=True).as_long():>4}")
+else:
+    print("UNSAT")
 

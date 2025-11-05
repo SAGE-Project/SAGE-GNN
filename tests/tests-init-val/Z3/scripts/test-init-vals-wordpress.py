@@ -22,7 +22,6 @@ if VERBOSE:
     set_option(verbose=10)
 
 opt = Optimize()
-t0 = time.perf_counter()
 set_param("opt.elim_01", False)            # perhaps not necessary, but keeps it simpler wrt initialization
 set_param("opt.dump_models", True)  # dump best current solution so far
 set_param("smt.elim_term_ite", False)  # avoids creating new variables that can obscure initial value setting.

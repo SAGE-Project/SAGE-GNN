@@ -43,8 +43,10 @@ initial_assign = [
 x = [[Int(f"x_{i}_{j}") for j in range(NUM_VMS)] for i in range(NUM_COMPONENTS)]
 y = [Int(f"y_{j}") for j in range(NUM_VMS)]
 set_option(verbose=10)
+set_param("opt.elim_01", False)            # perhaps not necessary, but keeps it simpler wrt initialization
+set_param("opt.dump_models", True)  # dump best current solution so far
+set_param("smt.elim_term_ite", False)  # avoids creating new variables that can obscure initial value setting.
 opt = Optimize()
-
 
 # Constraints
 for i in range(NUM_COMPONENTS):
