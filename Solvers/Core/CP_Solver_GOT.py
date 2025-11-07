@@ -443,7 +443,7 @@ class CP_Solver_Got:
         return numpy.sum(_priceVector), _priceVector, numpy.sum(_vm), _a
 
     def run(self):
-        #print("-----start run")
+        print("-----start run")
         if self.__optimization_problem:
             startTime, stopTime = self.__runMinimizationProblem()
         else:

@@ -13,10 +13,10 @@ class Z3_Solver_Int_Parent(ManuverSolver):#ManeuverProblem):
         if self.solverTypeOptimize:
             #TODO: set_param does not take into account the mode=init or not and
             # has to be commented manually for wrapper_z3.solve(application, offers_do) respectivelly for print(wrapper_z3.solve(application, offers_do, matrix_init=matrix, VMSpecs_init=VMSpecs, mode="init"))
-            set_option(verbose=10)
-            set_param("opt.elim_01", False)  # perhaps not necessary, but keeps it simpler wrt initialization
-            set_param("opt.dump_models", True)  # dump best current solution so far
-            set_param("smt.elim_term_ite", False)  # avoids creating new variables that can obscure initial value setting.
+            # set_option(verbose=10)
+            # set_param("opt.elim_01", False)  # perhaps not necessary, but keeps it simpler wrt initialization
+            # set_param("opt.dump_models", True)  # dump best current solution so far
+            # set_param("smt.elim_term_ite", False)  # avoids creating new variables that can obscure initial value setting.
             self.solver = Optimize()
         else:
             self.solver = Solver()

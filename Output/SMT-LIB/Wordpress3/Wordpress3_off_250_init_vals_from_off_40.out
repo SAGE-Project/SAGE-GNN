@@ -1,0 +1,135 @@
+; =========================================
+; Z3 Solver Result
+; =========================================
+
+; STATUS: SAT
+
+(set-logic QF_LIA)
+
+(model
+  (define-fun C4_VM3 () Int 0)
+  (define-fun C1_VM8 () Int 0)
+  (define-fun C3_VM5 () Int 0)
+  (define-fun C4_VM5 () Int 0)
+  (define-fun C5_VM4 () Int 0)
+  (define-fun C4_VM6 () Int 0)
+  (define-fun C1_VM3 () Int 0)
+  (define-fun C4_VM1 () Int 0)
+  (define-fun PriceProv2 () Int 126)
+  (define-fun PriceProv6 () Int 126)
+  (define-fun StorageProv5 () Int 2000)
+  (define-fun MemProv6 () Int 3750)
+  (define-fun C3_VM1 () Int 0)
+  (define-fun PriceProv7 () Int 126)
+  (define-fun C1_VM1 () Int 0)
+  (define-fun VM6Type () Int 225)
+  (define-fun C1_VM6 () Int 1)
+  (define-fun VM7Type () Int 225)
+  (define-fun C2_VM7 () Int 1)
+  (define-fun C3_VM3 () Int 0)
+  (define-fun StorageProv3 () Int 2000)
+  (define-fun StorageProv4 () Int 2000)
+  (define-fun PriceProv3 () Int 126)
+  (define-fun PriceProv1 () Int 210)
+  (define-fun ProcProv5 () Int 2)
+  (define-fun MemProv8 () Int 7500)
+  (define-fun VM3Type () Int 225)
+  (define-fun ProcProv8 () Int 4)
+  (define-fun C4_VM2 () Int 0)
+  (define-fun C2_VM8 () Int 0)
+  (define-fun C4_VM4 () Int 1)
+  (define-fun C1_VM2 () Int 1)
+  (define-fun PriceProv5 () Int 126)
+  (define-fun StorageProv1 () Int 2000)
+  (define-fun C4_VM8 () Int 0)
+  (define-fun C5_VM1 () Int 1)
+  (define-fun VM2Type () Int 225)
+  (define-fun PriceProv8 () Int 210)
+  (define-fun ProcProv3 () Int 2)
+  (define-fun StorageProv6 () Int 2000)
+  (define-fun VM5Type () Int 225)
+  (define-fun VM8Type () Int 182)
+  (define-fun C2_VM3 () Int 1)
+  (define-fun VM1Type () Int 182)
+  (define-fun StorageProv7 () Int 2000)
+  (define-fun C5_VM2 () Int 0)
+  (define-fun C5_VM3 () Int 0)
+  (define-fun MemProv2 () Int 3750)
+  (define-fun MemProv5 () Int 3750)
+  (define-fun ProcProv4 () Int 4)
+  (define-fun C4_VM7 () Int 0)
+  (define-fun C3_VM4 () Int 0)
+  (define-fun MemProv1 () Int 7500)
+  (define-fun C2_VM4 () Int 0)
+  (define-fun C3_VM8 () Int 0)
+  (define-fun MemProv4 () Int 7500)
+  (define-fun VM4Type () Int 182)
+  (define-fun C1_VM5 () Int 1)
+  (define-fun C2_VM2 () Int 0)
+  (define-fun C1_VM7 () Int 0)
+  (define-fun MemProv3 () Int 3750)
+  (define-fun StorageProv8 () Int 2000)
+  (define-fun C3_VM6 () Int 0)
+  (define-fun ProcProv7 () Int 2)
+  (define-fun C2_VM1 () Int 0)
+  (define-fun C3_VM2 () Int 0)
+  (define-fun C5_VM6 () Int 0)
+  (define-fun ProcProv1 () Int 4)
+  (define-fun C5_VM5 () Int 0)
+  (define-fun ProcProv2 () Int 2)
+  (define-fun ProcProv6 () Int 2)
+  (define-fun C5_VM8 () Int 1)
+  (define-fun PriceProv4 () Int 210)
+  (define-fun C1_VM4 () Int 0)
+  (define-fun StorageProv2 () Int 2000)
+  (define-fun C5_VM7 () Int 0)
+  (define-fun C2_VM5 () Int 0)
+  (define-fun C3_VM7 () Int 0)
+  (define-fun C2_VM6 () Int 0)
+  (define-fun MemProv7 () Int 3750)
+)
+
+; Optimized objective values
+(define-fun objective1 () Int 1260)
+
+; =========================================
+; Z3 Statistics (-st equivalent)
+; =========================================
+
+conflicts: 144730
+decisions: 381373
+propagations: 113100874
+binary propagations: 37510528
+restarts: 778
+final checks: 141
+added eqs: 15935235
+mk clause: 21114101
+mk clause binary: 8357
+del clause: 21113978
+minimized lits: 17201860
+num checks: 110
+mk bool var: 196951
+pb resolves: 6646
+pb conflicts: 7230
+pb propagations: 153178
+pb predicates: 7
+arith eq adapter: 79005
+arith-lower: 37729434
+arith-upper: 15510211
+arith-conflicts: 23059
+arith-bound-propagations-lp: 48678144
+arith-diseq: 25800386
+arith-make-feasible: 514325
+arith-max-columns: 375
+arith-max-rows: 26
+arith-fixed-eqs: 35995
+bv dynamic diseqs: 20888731
+bv bit2core: 598346
+bv->core eq: 1495
+rlimit count: 349280453
+max memory: 43.64
+memory: 38.01
+num allocs: 33390615583.0
+time: 45.391
+
+; End of SMT2LIB result file

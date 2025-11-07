@@ -1,0 +1,107 @@
+; =========================================
+; Z3 Solver Result
+; =========================================
+
+; STATUS: SAT
+
+(set-logic QF_LIA)
+
+(model
+  (define-fun VM2Type () Int 182)
+  (define-fun PriceProv2 () Int 210)
+  (define-fun StorageProv5 () Int 2000)
+  (define-fun VM4Type () Int 225)
+  (define-fun C3_VM3 () Int 0)
+  (define-fun C5_VM2 () Int 0)
+  (define-fun C4_VM5 () Int 0)
+  (define-fun C5_VM5 () Int 0)
+  (define-fun C1_VM5 () Int 0)
+  (define-fun StorageProv3 () Int 2000)
+  (define-fun StorageProv4 () Int 2000)
+  (define-fun C3_VM1 () Int 0)
+  (define-fun PriceProv3 () Int 210)
+  (define-fun PriceProv1 () Int 126)
+  (define-fun ProcProv5 () Int 4)
+  (define-fun C4_VM2 () Int 0)
+  (define-fun C1_VM1 () Int 0)
+  (define-fun PriceProv5 () Int 210)
+  (define-fun StorageProv1 () Int 2000)
+  (define-fun C2_VM5 () Int 0)
+  (define-fun ProcProv3 () Int 4)
+  (define-fun C2_VM4 () Int 0)
+  (define-fun C1_VM2 () Int 1)
+  (define-fun VM3Type () Int 182)
+  (define-fun C2_VM3 () Int 0)
+  (define-fun MemProv2 () Int 7500)
+  (define-fun C3_VM5 () Int 1)
+  (define-fun C1_VM3 () Int 0)
+  (define-fun MemProv5 () Int 7500)
+  (define-fun ProcProv4 () Int 2)
+  (define-fun C2_VM1 () Int 1)
+  (define-fun C2_VM2 () Int 0)
+  (define-fun MemProv1 () Int 3750)
+  (define-fun C5_VM3 () Int 1)
+  (define-fun C5_VM4 () Int 0)
+  (define-fun MemProv4 () Int 3750)
+  (define-fun MemProv3 () Int 7500)
+  (define-fun C4_VM1 () Int 0)
+  (define-fun C3_VM4 () Int 0)
+  (define-fun VM1Type () Int 225)
+  (define-fun ProcProv1 () Int 2)
+  (define-fun VM5Type () Int 182)
+  (define-fun ProcProv2 () Int 4)
+  (define-fun PriceProv4 () Int 126)
+  (define-fun C3_VM2 () Int 0)
+  (define-fun StorageProv2 () Int 2000)
+  (define-fun C5_VM1 () Int 0)
+  (define-fun C4_VM4 () Int 1)
+  (define-fun C4_VM3 () Int 0)
+  (define-fun C1_VM4 () Int 0)
+)
+
+; Optimized objective values
+(define-fun objective1 () Int 882)
+
+; =========================================
+; Z3 Statistics (-st equivalent)
+; =========================================
+
+conflicts: 8109
+decisions: 132907
+propagations: 6024605
+binary propagations: 1661182
+restarts: 63
+final checks: 121
+added eqs: 353795
+mk clause: 963021
+mk clause binary: 5192
+del clause: 962948
+minimized lits: 688187
+num checks: 94
+mk bool var: 93237
+pb resolves: 64
+pb conflicts: 65
+pb propagations: 1182
+pb predicates: 4
+arith eq adapter: 45298
+arith-lower: 2284580
+arith-upper: 564596
+arith-conflicts: 1075
+arith-bound-propagations-lp: 1674437
+arith-diseq: 1389903
+arith-make-feasible: 47655
+arith-max-columns: 339
+arith-max-rows: 17
+arith-fixed-eqs: 2036
+bv dynamic diseqs: 916961
+bv bit2core: 31279
+bv->core eq: 1083
+solve-eqs-steps: 16
+solve-eqs-elim-vars: 2
+num allocs: 1151074301
+rlimit count: 19229391
+max memory: 32.09
+memory: 29.21
+time: 2.824
+
+; End of SMT2LIB result file
