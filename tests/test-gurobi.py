@@ -2,56 +2,43 @@
 
 # Copyright 2025, Gurobi Optimization, LLC
 
-# This example reads a MIP model from a file, adds artificial
-# variables to each constraint, and then minimizes the sum of the
-# artificial variables.  A solution with objective zero corresponds
-# to a feasible solution to the input model.
-#
-# We can also use FeasRelax feature to do it. In this example, we
-# use minrelax=1, i.e. optimizing the returned model finds a solution
-# that minimizes the original objective, but only from among those
-# solutions that minimize the sum of the artificial variables.
+# This example formulates and solves the following simple bilinear model:
+#  maximize    x
+#  subject to  x + y + z <= 10
+#              x * y <= 2         (bilinear inequality)
+#              x * z + y * z = 1  (bilinear equality)
+#              x, y, z non-negative (x integral in second version)
 
-import sys
 import gurobipy as gp
+from gurobipy import GRB
 
-if len(sys.argv) < 2:
-    print("Usage: feasopt.py filename")
-    sys.exit(0)
+# Create a new model
+m = gp.Model("bilinear")
 
-feasmodel = gp.read(sys.argv[1])
+# Create variables
+x = m.addVar(name="x")
+y = m.addVar(name="y")
+z = m.addVar(name="z")
 
-# create a copy to use FeasRelax feature later
+# Set objective: maximize x
+m.setObjective(1.0 * x, GRB.MAXIMIZE)
 
-feasmodel1 = feasmodel.copy()
+# Add linear constraint: x + y + z <= 10
+m.addConstr(x + y + z <= 10, "c0")
 
-# clear objective
+# Add bilinear inequality constraint: x * y <= 2
+m.addConstr(x * y <= 2, "bilinear0")
 
-feasmodel.setObjective(0.0)
+# Add bilinear equality constraint: x * z + y * z == 1
+m.addConstr(x * z + y * z == 1, "bilinear1")
 
-# add slack variables
+# Optimize model
+m.optimize()
 
-for c in feasmodel.getConstrs():
-    sense = c.Sense
-    if sense != ">":
-        feasmodel.addVar(
-            obj=1.0, name=f"ArtN_{c.ConstrName}", column=gp.Column([-1], [c])
-        )
-    if sense != "<":
-        feasmodel.addVar(
-            obj=1.0, name=f"ArtP_{c.ConstrName}", column=gp.Column([1], [c])
-        )
+m.printAttr("x")
 
-# optimize modified model
+# Constrain 'x' to be integral and solve again
+x.VType = GRB.INTEGER
+m.optimize()
 
-feasmodel.optimize()
-
-feasmodel.write("feasopt.lp")
-
-# use FeasRelax feature
-
-feasmodel1.feasRelaxS(0, True, False, True)
-
-feasmodel1.write("feasopt1.lp")
-
-feasmodel1.optimize()
+m.printAttr("x")
