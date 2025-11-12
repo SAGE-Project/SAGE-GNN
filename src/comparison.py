@@ -10,7 +10,7 @@ from utils import utilsSMT
 with open("../Models/json/Wordpress.json", "r") as file:
     application = json.load(file)
 
-with open("../Data/json/offers_500.json", "r") as file:
+with open("../Data/json/offers_250.json", "r") as file:
     offers_do = json.load(file)
 
 #1.
@@ -33,9 +33,9 @@ with open("../Data/json/offers_500.json", "r") as file:
 # print(wrapper_gnn_z3.solve(application, offers_do, mode="gnn"))
 
 #5.
-wrapper_z3 = Wrapper_Z3(symmetry_breaker="None")
-matrix, VMSpecs = utilsSMT.parse_smt_file("/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/Wordpress4/Wordpress4_off_40.out")
-print(wrapper_z3.solve(application, offers_do, matrix_init=matrix, VMSpecs_init=VMSpecs, mode="init"))
+# wrapper_z3 = Wrapper_Z3(symmetry_breaker="None")
+# matrix, VMSpecs = utilsSMT.parse_smt_file("/Users/madalinaerascu/PycharmProjects/SAGE-GNN/Output/SMT-LIB/Wordpress6/WordPress6_off_20.out")
+# print(wrapper_z3.solve(application, offers_do, matrix_init=matrix, VMSpecs_init=VMSpecs, mode="init"))
 
 
 # # 5.

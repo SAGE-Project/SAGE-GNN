@@ -119,7 +119,7 @@ class Wrapper_Z3:
             offers_json,
             prediction=None,
             prediction_init=None,
-            inst=4,
+            inst=6,
             out=True,
             #out=False,
             mode=None,

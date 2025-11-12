@@ -129,6 +129,9 @@
   (define-fun StorageProv9 () Int 141000)
 )
 
+; Optimized objective values
+(define-fun objective1 () Int 1680)
+
 ; =========================================
 ; Z3 Statistics (-st equivalent)
 ; =========================================
@@ -155,10 +158,10 @@ arith-max-columns: 267
 arith-max-rows: 143
 arith-offset-eqs: 1044625
 arith-fixed-eqs: 2727225
-rlimit count: 224582133
+rlimit count: 224582157
 max memory: 28.36
 memory: 28.27
 num allocs: 12510079688.0
-time: 83.214
+time: 81.852
 
 ; End of SMT2LIB result file
