@@ -145,3 +145,4 @@ class CPlex_Solver_SB_Enc_AllCombinationsOffers(CPlex_Solver_Parent, ManuverSolv
         for index, var in self.vmType.items():
             vm_types.append(var.solution_value)
         return vm_types
+#
