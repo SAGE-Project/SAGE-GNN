@@ -4,6 +4,7 @@ from docplex.mp.conflict_refiner import ConflictRefiner, VarUbConstraintWrapper,
 import time
 from docplex.mp.functional import LogicalAndExpr
 from Solvers.Core.ManuverSolver import ManuverSolver
+import os
 
 class CPlex_Solver_Parent(ManuverSolver):
     def _initSolver(self):
@@ -66,30 +67,101 @@ class CPlex_Solver_Parent(ManuverSolver):
         self.vmType = {}
         self.PriceProv = {}
 
+    def createSMT2LIBFileSolution(self, fileName, status_str, solution):
+        if fileName is None:
+            return
+        with open(fileName, 'w+', encoding='utf-8') as f:
+            f.write("; =========================================\n")
+            f.write("; CPLEX Solver Result")
+            f.write("; =========================================\n\n")
+
+            f.write(f"; STATUS: {status_str}\n\n")
+            f.write("(set-logic QF_LIA)\n\n")
+
+            if status_str == "SAT" and solution:
+                f.write("(model\n")
+                for var in self.model.iter_variables():
+                    try:
+                        # Get value from solution
+                        val = solution[var]
+
+                        # Determine type (Int or Real)
+                        if var.is_discrete():
+                            val_str = str(int(round(val)))
+                            type_str = "Int"
+                        else:
+                            val_str = str(val)
+                            type_str = "Real"
+
+                        f.write(f"  (define-fun {var.name} () {type_str} {val_str})\n")
+                    except Exception:
+                        pass
+
+                        # Write Objective
+                try:
+                    obj_val = solution.objective_value
+                    f.write(f"  (define-fun objective () Real {obj_val})\n")
+                except:
+                    pass
+                f.write(")\n\n")
+            else:
+                f.write(f"; No model available ({status_str})\n\n")
+
+            f.write("; =========================================\n")
+            f.write("; CPLEX Statistics\n")
+            f.write("; =========================================\n\n")
+            try:
+                details = self.model.get_solve_details()
+                f.write(f"time: {details.time}\n")
+                f.write(f"mip_gap: {details.mip_relative_gap}\n")
+                f.write(f"n_columns: {self.model.number_of_variables}\n")
+                f.write(f"n_rows: {self.model.number_of_constraints}\n")
+            except Exception:
+                f.write("; Stats unavailable\n")
+
+            f.write("\n; End of result file\n")
+
+    import os  # <--- Asigura-te ca ai asta sus de tot
+
     def run(self):
         objective = self.model.sum(self.PriceProv[j] for j in range(self.nr_vms))
         self.model.minimize(objective)
-        #       self.model.prettyprint("out_oryx2")
-        self.model.export_as_lp(self.cplex)
-        #       self.model.export_as_mps("nou")
 
         vmPrice = []
         vmType = []
         a_mat = []
 
         self.get_current_time()
-
         starttime = time.time()
+
         xx = self.model.solve()
         stoptime = time.time()
 
-        if docplex.util.status.JobSolveStatus.OPTIMAL_SOLUTION == self.model.get_solve_status():
-            # Variables for offers description
+        solve_status = self.model.get_solve_status()
+
+        target_dir = os.path.join("Output", "CPLEX", "SecureWebContainer")
+
+        os.makedirs(target_dir, exist_ok=True)
+
+        raw_name = getattr(self, 'smt2libsol', None)
+        if raw_name:
+            filename = os.path.basename(raw_name)
+        else:
+            filename = "solution_cplex"
+
+        final_output_path = os.path.join(os.getcwd(), target_dir, filename)
+
+        print(f"DEBUG: Salvare solutie in: {final_output_path}")
+
+        self.createSMT2LIBFileSolution(final_output_path, solve_status, xx)
+
+        if solve_status == docplex.util.status.JobSolveStatus.OPTIMAL_SOLUTION or \
+                solve_status == docplex.util.status.JobSolveStatus.FEASIBLE_SOLUTION:
+
             vmType = self._get_solution_vm_type()
 
             for var in self.PriceProv:
-                vmPrice.append(int(self.model.solution.get_value(f"PriceProv{var+1}")))
-            #print(vmPrice)
+                vmPrice.append(int(xx.get_value(self.PriceProv[var])))
 
             l = []
             col = 0
@@ -99,24 +171,18 @@ class CPlex_Solver_Parent(ManuverSolver):
                     l = []
                     col = 0
                 col += 1
-                l.append(int(var.solution_value))
+                l.append(int(xx.get_value(var)))
             a_mat.append(l)
 
         else:
-            cr = ConflictRefiner()
-            conflicts = cr.refine_conflict(self.model)
-            for conflict in conflicts:
-                st = conflict.status
-                ct = conflict.element
-                label = conflict.name
-                label_type = type(conflict.element)
-                if isinstance(conflict.element, VarLbConstraintWrapper)\
-                        or isinstance(conflict.element, VarUbConstraintWrapper):
-                    ct = conflict.element.get_constraint()
-                # Print conflict information in console
+            try:
+                cr = ConflictRefiner()
+                conflicts = cr.refine_conflict(self.model)
+            except:
+                pass
 
-        return xx.get_objective_value(), vmPrice, stoptime - starttime, a_mat, vmType
-        # return None, None, stoptime - starttime, None, None
+        obj_val = xx.objective_value if xx else -1
+        return obj_val, vmPrice, stoptime - starttime, a_mat, vmType
 
     def RestrictionLex(self, vm_id, additional_constraints=[]):
         """
@@ -201,9 +267,10 @@ class CPlex_Solver_Parent(ManuverSolver):
         return sum([self.a[i, vm_id] for i in range(self.nr_comps)]) == \
                sum([self.a[i, vm_id + 1] for i in range(self.nr_comps)])
 
+    #conflicts
     def RestrictionConflict(self, alphaCompId, conflictCompsIdList):
         """
-        Constraint describing the conflict between components. The 2 params. should not be placed on the same VM
+        Constraint describing the conflict betweeen components. The 2 params. should not be placed on the same VM
         :param alphaCompId: id of the first conflict component
         :param conflictCompsIdList: id of the second conflict component
         :return: None
